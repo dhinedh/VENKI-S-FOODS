@@ -1,31 +1,14 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { Search, SlidersHorizontal, Package, X, ArrowRight, Loader2 } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { Search, SlidersHorizontal, Package, X, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import FoodCard from '../components/FoodCard';
 import SEOHead from '../components/SEOHead';
-import api from '../lib/api';
+import products from '../data/products.json';
 import { Link } from 'react-router-dom';
 
 const Combos = () => {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('featured');
-
-  useEffect(() => {
-    const fetchCombos = async () => {
-      try {
-        const { data } = await api.get('/products');
-        setProducts(data);
-      } catch (err) {
-        console.error("Failed to fetch combos:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchCombos();
-  }, []);
-
 
   const comboProducts = useMemo(() => {
     return products.filter(product => {
@@ -133,17 +116,12 @@ const Combos = () => {
         </div>
 
         {/* Results */}
-        {loading ? (
-          <div style={{ display: 'flex', justifyContent: 'center', padding: '5rem' }}>
-            <Loader2 className="animate-spin" size={48} color="var(--primary-gold)" />
-          </div>
-        ) : comboProducts.length > 0 ? (
+        {comboProducts.length > 0 ? (
           <div style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fill, minmax(min(280px, 100%), 1fr))',
             gap: '1.5rem'
           }}>
-
             {comboProducts.map(product => (
               <FoodCard key={product.id} product={product} />
             ))}

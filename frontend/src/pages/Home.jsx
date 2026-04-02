@@ -1,30 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ShoppingBag, ChevronRight, Heart, ShieldCheck, Star, Award, Truck, Mail, MapPin, Loader2 } from 'lucide-react';
+import { ShoppingBag, ChevronRight, Heart, ShieldCheck, Star, Award, Truck, Mail, MapPin } from 'lucide-react';
 import FoodCard from '../components/FoodCard';
 import SEOHead from '../components/SEOHead';
-import api from '../lib/api';
+import productsData from '../data/products.json';
 
 const Home = () => {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  // Always use local products.json — it has the real branded images
+  // The API may contain older/different DB records without images
+  const products = productsData;
 
-  useEffect(() => {
-    const fetchHomeData = async () => {
-      try {
-        const { data } = await api.get('/products');
-        setProducts(data);
-      } catch (err) {
-        console.error("Failed to fetch featured products:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchHomeData();
-  }, []);
-
-  // Prioritise products with high-quality images and specific categories
+  // Prioritise products with local branded images (non-unsplash)
   const featured = products
     .filter(p => p.image && !p.image.includes('unsplash'))
     .slice(0, 4)
@@ -32,7 +19,6 @@ const Home = () => {
     .slice(0, 4);
 
   const categories = [...new Set(products.map(p => p.category))];
-
 
   return (
     <div className="home-page overflow-hidden">
