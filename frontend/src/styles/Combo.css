@@ -1,0 +1,159 @@
+.combo-page {
+  padding-top: 150px;
+  padding-bottom: 100px;
+  background-color: var(--bg-color);
+  background-image: radial-gradient(circle at 1px 1px, rgba(212, 162, 85, 0.05) 1px, transparent 0);
+  background-size: 30px 30px;
+}
+
+.combo-header {
+  margin-bottom: 80px;
+}
+
+.combo-desc {
+  max-width: 650px;
+  margin: 20px auto 0;
+  color: #64748b;
+  font-size: 1.15rem;
+}
+
+.combo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: 40px;
+}
+
+.combo-card {
+  border-radius: 32px;
+  overflow: hidden;
+  height: 100%;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.combo-card:hover {
+  transform: translateY(-12px);
+  box-shadow: 0 30px 60px -15px rgba(45, 36, 30, 0.15);
+}
+
+.combo-image-wrap {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  margin: 15px;
+  border-radius: 20px;
+  background: white;
+}
+
+.combo-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 30px;
+  transition: transform 0.8s ease;
+}
+
+.combo-card:hover .combo-image {
+  transform: scale(1.1);
+}
+
+.combo-tag {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  padding: 6px 14px;
+  color: var(--white);
+  font-size: 0.75rem;
+  font-weight: 800;
+  border-radius: 10px;
+  z-index: 2;
+  text-transform: uppercase;
+}
+
+.combo-seal {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.combo-savings-banner {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: rgba(34, 197, 94, 0.9);
+  backdrop-filter: blur(4px);
+  color: white;
+  padding: 8px;
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.combo-info {
+  padding: 10px 30px 35px;
+}
+
+.combo-name {
+  font-family: var(--font-serif);
+  font-size: 1.8rem;
+  color: var(--text-color);
+  margin-bottom: 12px;
+  line-height: 1.2;
+}
+
+.combo-contents {
+  color: #64748b;
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 30px;
+}
+
+.combo-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.combo-pricing {
+  display: flex;
+  flex-direction: column;
+}
+
+.combo-price {
+  font-size: 2rem;
+  font-family: var(--font-serif);
+  font-weight: 800;
+  color: var(--accent-color);
+}
+
+.combo-original-price {
+  font-size: 1rem;
+  color: #94a3b8;
+  text-decoration: line-through;
+  font-weight: 600;
+  margin-top: -5px;
+}
+
+.combo-buy-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 24px;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+@media (max-width: 768px) {
+  .combo-grid {
+    grid-template-columns: 1fr;
+  }
+}

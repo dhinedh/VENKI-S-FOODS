@@ -1,0 +1,344 @@
+import React, { useState, useEffect } from 'react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { Star, ShieldCheck, Truck, ArrowLeft, Plus, Minus, Send, AlertCircle, ShoppingBag } from 'lucide-react';
+import useCartStore from '../store/cartStore';
+import products from '../data/products.json';
+import api from '../lib/api';
+import { supabase } from '../lib/supabase';
+import SEOHead from '../components/SEOHead';
+import LazyImage from '../components/LazyImage';
+
+/**
+ * ProductDetail.jsx
+ * - Fetch product data from products.json by id.
+ * - Grid: Left (Image), Right (Details: Name, Tags, Price, Description, is_veg badge).
+ * - Counter and "Add to Cart" button.
+ * - Reviews Section: Fetch approved reviews from /api/reviews/:productId.
+ * - Verified Buyer Form: If logged in, show review form. Submit to /api/reviews.
+ */
+import productsData from '../data/products.json';
+
+const ProductDetail = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const addItem = useCartStore((state) => state.addItem);
+  
+  const [product, setProduct] = useState(productsData.find(p => String(p.id) === String(id)));
+  const [loading, setLoading] = useState(true);
+  const [qty, setQty] = useState(1);
+  const [reviews, setReviews] = useState([]);
+  const [loadingReviews, setLoadingReviews] = useState(true);
+  
+  // Review Form State
+  const [reviewForm, setReviewForm] = useState({ rating: 5, comment: '', order_id: '' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [reviewMsg, setReviewMsg] = useState({ type: '', text: '' });
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      // 1. Double check dynamic product data if needed, but we already have mock
+      try {
+        const { data: dynamicProd } = await api.get(`/products/${id}`);
+        if (dynamicProd) setProduct(dynamicProd);
+      } catch (err) {
+        console.log("ProductDetail: Using stable mock fallback.");
+      } finally {
+        setLoading(false);
+      }
+
+
+      // 2. Fetch Reviews
+      try {
+        const { data } = await api.get(`/reviews/${id}`);
+        setReviews(data);
+      } catch (err) {
+        console.error("Failed to fetch reviews");
+      } finally {
+        setLoadingReviews(false);
+      }
+
+      // 3. Get User for Review Form
+      try {
+        const { data: { user: authUser } } = await supabase.auth.getUser();
+        setUser(authUser);
+      } catch (e) {
+        // Not logged in, that's fine
+      }
+    };
+
+    fetchData();
+  }, [id, navigate]);
+
+  if (loading && !product) return (
+    <div className="container py-20 text-center">
+      <Loader2 className="animate-spin" size={48} />
+    </div>
+  );
+  
+  if (!product) return (
+    <div className="container py-20 text-center">
+       <h2>Product Not Found</h2>
+       <Link to="/menu" className="btn btn-primary mt-6">Return to Menu</Link>
+    </div>
+  );
+
+
+  const handleAddToCart = () => {
+    addItem({ ...product }, qty);
+    // Optional: Toast or feedback
+  };
+
+  const handleSubmitReview = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setReviewMsg({ type: '', text: '' });
+
+    try {
+      const { data } = await api.post('/reviews', {
+        user_id: user.id,
+        product_id: product.id,
+        ...reviewForm
+      });
+      setReviewMsg({ type: 'success', text: "Review submitted! It will appear after admin approval." });
+      setReviewForm({ rating: 5, comment: '', order_id: '' });
+    } catch (err) {
+      setReviewMsg({ type: 'error', text: err.response?.data?.error || "Review submission failed." });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const avgRating = reviews.length > 0 
+    ? (reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1)
+    : "New";
+
+  return (
+    <div className="product-page container section-padding">
+      <SEOHead 
+        title={`${product.name} | Venki's Foods`} 
+        description={product.description} 
+        image={product.image}
+      />
+
+      <Link to="/menu" className="back-link">
+        <ArrowLeft size={20} /> Back to Menu
+      </Link>
+
+      <div className="product-layout grid grid-2 section-padding pt-6">
+        {/* Left: Image */}
+        <div className="product-visual">
+          <div className="detail-img-wrapper glass-card">
+            <LazyImage src={product.image} alt={product.name} className="detail-img" />
+          </div>
+          <div className="detail-badges">
+            <div className={`diet-pill ${product.is_veg ? 'veg' : 'non-veg'}`}>
+              <div className="dot"></div>
+              {product.is_veg ? 'Vegetarian' : 'Non-Vegetarian'}
+            </div>
+            {product.tags.map(tag => (
+              <span key={tag} className="tag-pill">{tag}</span>
+            ))}
+          </div>
+        </div>
+
+        {/* Right: Info */}
+        <div className="product-info">
+          <span className="category-label">{product.category}</span>
+          <h1 className="product-title">{product.name}</h1>
+          
+          <div className="rating-row">
+            <div className="stars">
+              {[1,2,3,4,5].map(s => (
+                <Star key={s} size={18} fill={s <= Math.round(avgRating) ? "var(--primary-color)" : "none"} color="var(--primary-color)" />
+              ))}
+            </div>
+            <span className="rating-count">({reviews.length} Verified Reviews)</span>
+          </div>
+
+          <div className="price-tag">₹{product.price}</div>
+          
+          <p className="product-desc">{product.description}</p>
+
+          <div className="trust-badges mt-8">
+            <div className="trust-item"><ShieldCheck size={20} /> No Preservatives</div>
+            <div className="trust-item"><Truck size={20} /> 60-Min Delivery</div>
+          </div>
+
+          <div className="purchase-controls mt-10">
+            <div className="qty-picker">
+              <button onClick={() => setQty(Math.max(1, qty - 1))}><Minus size={18}/></button>
+              <span>{qty}</span>
+              <button onClick={() => setQty(qty + 1)}><Plus size={18}/></button>
+            </div>
+            <button 
+              className={`btn btn-primary btn-lg flex-1 ${!product.is_available ? 'disabled' : ''}`}
+              onClick={handleAddToCart}
+              disabled={!product.is_available}
+            >
+               <ShoppingBag size={20} /> {product.is_available ? 'Add to Cart' : 'Currently Unavailable'}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Reviews Section */}
+      <section className="reviews-section section-padding">
+        <div className="divider mb-10"></div>
+        <div className="reviews-header">
+          <h2>Customer Feedback</h2>
+          <div className="avg-rating-hero">
+             <span className="score">{avgRating}</span>
+             <div className="subtitle">Average Rating</div>
+          </div>
+        </div>
+
+        <div className="reviews-layout">
+          {/* Review List */}
+          <div className="reviews-list">
+            {loadingReviews ? (
+              <p>Loading feedback...</p>
+            ) : reviews.length > 0 ? (
+              reviews.map(review => (
+                <div key={review.id} className="review-card glass-card">
+                  <div className="review-top">
+                    <div className="stars">
+                      {[1,2,3,4,5].map(s => (
+                        <Star key={s} size={14} fill={s <= review.rating ? "var(--primary-color)" : "none"} color="var(--primary-color)" />
+                      ))}
+                    </div>
+                    <span className="review-date">{new Date(review.created_at).toLocaleDateString()}</span>
+                  </div>
+                  <p className="review-comment">"{review.comment}"</p>
+                  <div className="review-author">Verified Buyer</div>
+                </div>
+              ))
+            ) : (
+              <p className="no-reviews">No reviews for this product yet. Be the first!</p>
+            )}
+          </div>
+
+          {/* Review Submission Form (Verified Buyers Only) */}
+          <div className="review-form-container">
+            {user ? (
+              <div className="review-form-card glass-card">
+                <h3>Rate this product</h3>
+                <p className="text-sm text-secondary mb-6">Only customers who have purchased this product can leave a review.</p>
+                <form onSubmit={handleSubmitReview}>
+                  <div className="form-group">
+                    <label>Order ID (Required for verification)</label>
+                    <input 
+                      type="text" required placeholder="Paste your Order ID from My Orders" 
+                      value={reviewForm.order_id} onChange={(e) => setReviewForm({...reviewForm, order_id: e.target.value})}
+                    />
+                  </div>
+                  <div className="form-group mt-4">
+                    <label>Rating</label>
+                    <select value={reviewForm.rating} onChange={(e) => setReviewForm({...reviewForm, rating: parseInt(e.target.value)})}>
+                      <option value="5">5 Stars - Amazing</option>
+                      <option value="4">4 Stars - Very Good</option>
+                      <option value="3">3 Stars - Good</option>
+                      <option value="2">2 Stars - Average</option>
+                      <option value="1">1 Star - Poor</option>
+                    </select>
+                  </div>
+                  <div className="form-group mt-4">
+                    <label>Your Feedback</label>
+                    <textarea 
+                      required rows="4" placeholder="How was the taste, texture, and spice level?"
+                      value={reviewForm.comment} onChange={(e) => setReviewForm({...reviewForm, comment: e.target.value})}
+                    ></textarea>
+                  </div>
+
+                  {reviewMsg.text && (
+                    <div className={`form-msg ${reviewMsg.type}`}>
+                      {reviewMsg.type === 'error' ? <AlertCircle size={18}/> : <ShieldCheck size={18}/>}
+                      {reviewMsg.text}
+                    </div>
+                  )}
+
+                  <button type="submit" className="btn btn-secondary btn-full mt-6" disabled={isSubmitting}>
+                    {isSubmitting ? "Submitting..." : <>Submit Review <Send size={18}/></>}
+                  </button>
+                </form>
+              </div>
+            ) : (
+              <div className="login-to-review glass-card">
+                <h3>Want to share your experience?</h3>
+                <p>Log in to leave a verified buyer review.</p>
+                <Link to="/login" className="btn btn-primary mt-4">Login to Review</Link>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+
+      <style>{`
+        .back-link { display: flex; align-items: center; gap: 8px; font-weight: 600; color: var(--text-secondary); transition: 0.3s; }
+        .back-link:hover { color: var(--primary-color); }
+        .pt-6 { padding-top: 2rem; }
+        
+        .grid-2 { display: grid; grid-template-columns: 1.2fr 1fr; gap: 5rem; }
+        .detail-img-wrapper { border-radius: 40px; overflow: hidden; position: relative; }
+        .detail-img { width: 100%; height: 500px; object-fit: cover; }
+        
+        .detail-badges { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 1.5rem; }
+        .diet-pill {
+          display: flex; align-items: center; gap: 8px;
+          background: rgba(255,255,255,0.05); border: 1px solid var(--border-glass);
+          padding: 8px 16px; border-radius: 30px; font-weight: 700; font-size: 0.9rem;
+        }
+        .diet-pill .dot { width: 10px; height: 10px; border-radius: 50%; }
+        .diet-pill.veg .dot { background: #4caf50; boxShadow: 0 0 10px #4caf50; }
+        .diet-pill.non-veg .dot { background: #f44336; boxShadow: 0 0 10px #f44336; }
+        .tag-pill { background: var(--primary-glow); color: var(--primary-color); padding: 8px 16px; border-radius: 30px; font-weight: 700; font-size: 0.9rem; }
+
+        .category-label { color: var(--primary-color); font-weight: 800; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 2px; }
+        .product-title { font-size: 3.5rem; margin-top: 0.5rem; }
+        .rating-row { display: flex; align-items: center; gap: 15px; margin-top: 1rem; }
+        .rating-count { color: var(--text-secondary); font-weight: 600; }
+        .price-tag { font-size: 3rem; font-weight: 700; margin: 2rem 0; color: #fff; }
+        .product-desc { font-size: 1.15rem; color: var(--text-secondary); max-width: 500px; }
+        
+        .trust-badges { display: flex; gap: 2rem; }
+        .trust-item { display: flex; align-items: center; gap: 10px; font-weight: 700; color: var(--text-secondary); }
+        
+        .purchase-controls { display: flex; gap: 1.5rem; }
+        .qty-picker {
+          display: flex; align-items: center; gap: 20px;
+          background: rgba(255,255,255,0.05); border: 1px solid var(--border-glass);
+          padding: 0 20px; border-radius: var(--radius-md); font-size: 1.25rem; font-weight: 700;
+        }
+        .qty-picker button { color: var(--primary-color); padding: 10px 0; }
+        .flex-1 { flex: 1; }
+        .mt-10 { margin-top: 2.5rem; }
+
+        .reviews-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4rem; }
+        .avg-rating-hero { text-align: center; }
+        .avg-rating-hero .score { font-size: 4rem; font-weight: 800; color: var(--primary-color); line-height: 1; }
+        .avg-rating-hero .subtitle { color: var(--text-secondary); font-weight: 700; }
+        
+        .reviews-layout { display: grid; grid-template-columns: 1fr 400px; gap: 4rem; }
+        .review-card { padding: 2rem; margin-bottom: 1.5rem; }
+        .review-top { display: flex; justify-content: space-between; margin-bottom: 1rem; }
+        .review-comment { font-style: italic; font-size: 1.1rem; margin-bottom: 1.5rem; color: #fff; }
+        .review-author { font-weight: 700; color: var(--primary-color); font-size: 0.9rem; text-transform: uppercase; }
+        .review-date { color: var(--text-secondary); font-size: 0.8rem; }
+        
+        .review-form-card { padding: 2.5rem; }
+        .form-msg { margin-top: 1.5rem; padding: 1rem; border-radius: var(--radius-md); display: flex; align-items: center; gap: 10px; font-weight: 600; }
+        .form-msg.success { background: rgba(0, 200, 83, 0.1); border: 1px solid var(--success); color: var(--success); }
+        .form-msg.error { background: rgba(255, 82, 82, 0.1); border: 1px solid var(--error); color: var(--error); }
+        .login-to-review { padding: 3rem; text-align: center; }
+
+        @media (max-width: 991px) {
+          .grid-2 { grid-template-columns: 1fr; }
+          .detail-img { height: 400px; }
+          .reviews-layout { grid-template-columns: 1fr; }
+        }
+      `}</style>
+    </div>
+  );
+};
+
+export default ProductDetail;

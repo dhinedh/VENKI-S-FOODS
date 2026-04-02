@@ -1,0 +1,86 @@
+[
+  {
+    "id": "1",
+    "name": "Andhra Parupu Podi",
+    "category": "podi",
+    "tags": ["veg", "spicy", "andhra"],
+    "is_veg": true,
+    "weight": "100gm",
+    "price": 75,
+    "description": "Authentic Andhra-style lentil podi. Perfect with hot rice and ghee. Keep refrigerated.",
+    "image": "/products/andhra-parupu-podi.jpg",
+    "is_available": true
+  },
+  {
+    "id": "2",
+    "name": "Thakali Thokku",
+    "category": "thokku",
+    "tags": ["veg", "tangy", "tomato"],
+    "is_veg": true,
+    "weight": "250gm",
+    "price": 130,
+    "description": "Tangy tomato thokku made the traditional way. Goes well with idli, dosa and rice. Keep refrigerated.",
+    "image": "/products/thakkali-thokku.jpg",
+    "is_available": true
+  },
+  {
+    "id": "3",
+    "name": "Nellai Ellu Idli Podi",
+    "category": "podi",
+    "tags": ["veg", "sesame", "nellai", "bestseller"],
+    "is_veg": true,
+    "weight": "100gm",
+    "price": 100,
+    "description": "Nellai-style sesame idli podi with a rich, nutty flavour. A bestseller. Keep refrigerated.",
+    "image": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&q=80&w=600",
+    "is_available": true
+  },
+  {
+    "id": "4",
+    "name": "Vathal Kulambu",
+    "category": "kulambu",
+    "tags": ["veg", "spicy", "traditional"],
+    "is_veg": true,
+    "weight": "250gm",
+    "price": 199,
+    "description": "Traditional Vathal Kulambu with sun-dried vegetables and tamarind base. Heat and serve. Keep refrigerated.",
+    "image": "/products/vathal-kulambu.jpg",
+    "is_available": true
+  },
+  {
+    "id": "5",
+    "name": "Chicken Pickle",
+    "category": "pickle",
+    "tags": ["non-veg", "spicy", "pickle"],
+    "is_veg": false,
+    "weight": "250gm",
+    "price": 250,
+    "description": "Spicy homemade chicken pickle with authentic masala. Keep refrigerated.",
+    "image": "/products/chicken-pickle.jpg",
+    "is_available": true
+  },
+  {
+    "id": "6",
+    "name": "Fish Pickle",
+    "category": "pickle",
+    "tags": ["non-veg", "spicy", "pickle"],
+    "is_veg": false,
+    "weight": "250gm",
+    "price": 250,
+    "description": "Tangy and spicy fish pickle made fresh at home. Keep refrigerated.",
+    "image": "/products/fish-pickle.jpg",
+    "is_available": true
+  },
+  {
+    "id": "7",
+    "name": "Prawn Pickle",
+    "category": "pickle",
+    "tags": ["non-veg", "spicy", "pickle", "premium"],
+    "is_veg": false,
+    "weight": "250gm",
+    "price": 320,
+    "description": "Premium prawn pickle marinated in special spices. A true seafood lover's delight. Keep refrigerated.",
+    "image": "/products/prawn-pickle.jpg",
+    "is_available": true
+  }
+]

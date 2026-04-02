@@ -1,0 +1,233 @@
+.cart-page {
+  padding-top: 120px;
+  padding-bottom: 80px;
+  background-color: var(--background-color);
+  min-height: 100vh;
+}
+
+.cart-header {
+  margin-bottom: 40px;
+}
+
+.back-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-color);
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 16px;
+  transition: var(--transition-smooth);
+}
+
+.back-link:hover {
+  color: var(--accent-color);
+}
+
+.title-serif {
+  font-family: var(--font-serif);
+  font-size: 2.5rem;
+  margin-bottom: 8px;
+}
+
+.cart-count {
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.cart-main {
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: 40px;
+  align-items: start;
+}
+
+.cart-items {
+  background: var(--white);
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+}
+
+.cart-item {
+  display: grid;
+  grid-template-columns: 100px 1fr 120px 100px 50px;
+  align-items: center;
+  padding: 24px;
+  border-bottom: 1px solid var(--border-color);
+  gap: 20px;
+}
+
+.cart-item:last-child {
+  border-bottom: none;
+}
+
+.item-image-wrap {
+  width: 100px;
+  height: 100px;
+  background: var(--background-color);
+  border-radius: 8px;
+  overflow: hidden;
+  padding: 10px;
+}
+
+.item-image-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.item-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.item-price-unit {
+  color: #888;
+  font-size: 0.9rem;
+}
+
+.item-quantity {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background: var(--background-color);
+  padding: 8px 12px;
+  border-radius: 30px;
+  width: fit-content;
+}
+
+.qty-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  color: var(--text-color);
+  transition: var(--transition-smooth);
+}
+
+.qty-btn:hover {
+  color: var(--accent-color);
+}
+
+.item-total {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--text-color);
+}
+
+.item-remove {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #ccc;
+  transition: var(--transition-smooth);
+}
+
+.item-remove:hover {
+  color: #ff4d4d;
+}
+
+.order-summary {
+  background: var(--white);
+  padding: 30px;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  position: sticky;
+  top: 100px;
+}
+
+.order-summary h3 {
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  margin-bottom: 24px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  font-size: 0.95rem;
+  color: #666;
+}
+
+.summary-total {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 2px solid var(--border-color);
+  font-weight: 700;
+  font-size: 1.25rem;
+}
+
+.total-price {
+  color: var(--accent-color);
+}
+
+.btn-full {
+  width: 100%;
+  margin-top: 30px;
+  justify-content: center;
+}
+
+.secure-text {
+  margin-top: 20px;
+  font-size: 0.8rem;
+  color: #999;
+  text-align: center;
+}
+
+.empty-cart-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100px 0;
+  text-align: center;
+}
+
+.empty-cart-content h2 {
+  font-family: var(--font-serif);
+  font-size: 2rem;
+  margin: 20px 0 10px;
+}
+
+.empty-cart-content p {
+  color: #666;
+  margin-bottom: 30px;
+}
+
+@media (max-width: 992px) {
+  .cart-main {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .cart-item {
+    grid-template-columns: 80px 1fr 1fr;
+    grid-template-areas: 
+      "img name remove"
+      "img qty price";
+    gap: 15px;
+  }
+
+  .item-image-wrap {
+    grid-area: img;
+    width: 80px;
+    height: 80px;
+  }
+
+  .item-details { grid-area: name; }
+  .item-quantity { grid-area: qty; }
+  .item-total { grid-area: price; text-align: right; }
+  .item-remove { grid-area: remove; text-align: right; }
+}

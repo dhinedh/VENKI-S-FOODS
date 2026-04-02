@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Static Pages -->
+  <url>
+    <loc>https://venkis-foods.vercel.app/</loc>
+    <lastmod>2026-03-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://venkis-foods.vercel.app/menu</loc>
+    <lastmod>2026-03-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://venkis-foods.vercel.app/track</loc>
+    <lastmod>2026-03-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://venkis-foods.vercel.app/login</loc>
+    <lastmod>2026-03-28</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+  <!-- Product Pages (Generated from products.json) -->
+  <url>
+    <loc>https://venkis-foods.vercel.app/menu/1</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://venkis-foods.vercel.app/menu/2</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://venkis-foods.vercel.app/menu/3</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://venkis-foods.vercel.app/menu/4</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://venkis-foods.vercel.app/menu/5</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://venkis-foods.vercel.app/menu/6</loc>
+    <priority>0.8</priority>
+  </url>
+</urlset>

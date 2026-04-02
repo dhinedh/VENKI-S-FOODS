@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /checkout
+Disallow: /orders
+
+Sitemap: https://venkis-foods.vercel.app/sitemap.xml

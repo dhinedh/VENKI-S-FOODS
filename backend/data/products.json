@@ -1,0 +1,95 @@
+[
+  {
+    "id": 1,
+    "name": "Classic Mango Pickle",
+    "category": "Pickles",
+    "tags": ["Traditional", "Spicy", "Best Seller"],
+    "is_veg": true,
+    "price": 199,
+    "originalPrice": 249,
+    "description": "Traditional sun-dried mangoes marinated in cold-pressed sesame oil and hand-ground spices.",
+    "image": "https://res.cloudinary.com/venkis-foods/image/upload/q_auto,f_auto,w_400/v1/pickles/mango.webp",
+    "is_available": true
+  },
+  {
+    "id": 2,
+    "name": "Spicy Lemon Thokku",
+    "category": "Pickles",
+    "tags": ["Tangy", "Zesty"],
+    "is_veg": true,
+    "price": 179,
+    "description": "A zesty explosion of salt-cured lemons with a hint of green chilies and ginger.",
+    "image": "https://res.cloudinary.com/venkis-foods/image/upload/q_auto,f_auto,w_400/v1/pickles/lemon.webp",
+    "is_available": true
+  },
+  {
+    "id": 3,
+    "name": "Authentic Chicken Pickle",
+    "category": "Meat Specials",
+    "tags": ["Non-Veg", "Protein Rich", "Signature"],
+    "is_veg": false,
+    "price": 499,
+    "originalPrice": 599,
+    "description": "Boneless chicken chunks fried to perfection and blended with our signature masala.",
+    "image": "https://res.cloudinary.com/venkis-foods/image/upload/q_auto,f_auto,w_400/v1/pickles/chicken.webp",
+    "is_available": true
+  },
+  {
+    "id": 4,
+    "name": "Royyala Pachadi (Prawns)",
+    "category": "Meat Specials",
+    "tags": ["Seafood", "Coastal Style"],
+    "is_veg": false,
+    "price": 599,
+    "description": "Coastal style prawn pickle made with catch-of-the-day prawns and slow-roasted spices.",
+    "image": "https://res.cloudinary.com/venkis-foods/image/upload/q_auto,f_auto,w_400/v1/pickles/prawns.webp",
+    "is_available": true
+  },
+  {
+    "id": 5,
+    "name": "Garlic (Velulli) Pickle",
+    "category": "Pickles",
+    "tags": ["Immunity", "Bold Flavor"],
+    "is_veg": true,
+    "price": 249,
+    "originalPrice": 299,
+    "description": "Concentrated velulli (garlic) cloves slow-cooked with tamarind and red chilies.",
+    "image": "https://res.cloudinary.com/venkis-foods/image/upload/q_auto,f_auto,w_400/v1/pickles/garlic.webp",
+    "is_available": true
+  },
+  {
+    "id": 6,
+    "name": "Inji Puli (Ginger Tamarind)",
+    "category": "Pickles",
+    "tags": ["Sweet & Sour", "Digestive"],
+    "is_veg": true,
+    "price": 189,
+    "description": "Finely shredded ginger balanced with jaggery and sour tamarind.",
+    "image": "https://res.cloudinary.com/venkis-foods/image/upload/q_auto,f_auto,w_400/v1/pickles/ginger.webp",
+    "is_available": true
+  },
+  {
+    "id": 7,
+    "name": "Veg Heritage Combo",
+    "category": "Combos",
+    "tags": ["Bundle", "Veg Supreme"],
+    "is_veg": true,
+    "price": 549,
+    "originalPrice": 699,
+    "description": "The ultimate veg trio: Classic Mango, Spicy Lemon, and Velulli Garlic. 250g each.",
+    "image": "https://images.unsplash.com/photo-1599481238640-4c1288750d7a?auto=format&fit=crop&q=80&w=400",
+    "is_available": true
+  },
+  {
+    "id": 8,
+    "name": "Non-Veg Protein Pack",
+    "category": "Combos",
+    "tags": ["Meat Lover", "Best Value"],
+    "is_veg": false,
+    "price": 999,
+    "originalPrice": 1199,
+    "description": "Signature Chicken Pickle + Royyala Pachadi (Prawns). The perfect meat lover's gift.",
+    "image": "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&q=80&w=400",
+    "is_available": true
+  }
+]
