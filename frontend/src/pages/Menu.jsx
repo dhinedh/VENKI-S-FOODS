@@ -3,20 +3,35 @@ import { useSearchParams } from 'react-router-dom';
 import { Search, SlidersHorizontal, ChevronDown, Check, X } from 'lucide-react';
 import FoodCard from '../components/FoodCard';
 import SEOHead from '../components/SEOHead';
-import productsData from '../data/products.json';
-import api from '../lib/api';
-
 const Menu = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const initialCategory = searchParams.get('category') || 'All';
   
-  const [products] = useState(productsData);
-  const [loading, setLoading] = useState(false);
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState(initialCategory);
   const [vegOnly, setVegOnly] = useState(false);
   const [sortBy, setSortBy] = useState('featured'); 
   const [showFilters, setShowFilters] = useState(false);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const { data } = await api.get('/products');
+        setProducts(data);
+      } catch (err) {
+        console.error("Failed to load products:", err);
+        setError("Unable to load heritage menu. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProducts();
+  }, []);
+
 
   // Venki's Foods Specific Categories
   const categories = ['All', 'Podi', 'Thokku & Kulambu', 'Pickle', 'Combo'];
@@ -151,13 +166,18 @@ const Menu = () => {
 
         {/* Product Grid */}
         <main className="menu-main">
-          {filteredProducts.length > 0 ? (
+          {loading ? (
+            <div className="flex justify-center py-20">
+              <div className="spinner"></div>
+            </div>
+          ) : filteredProducts.length > 0 ? (
             <div className="grid grid-3">
               {filteredProducts.map(product => (
                 <FoodCard key={product.id} product={product} />
               ))}
             </div>
           ) : (
+
             <div className="no-results glass-card">
               <Search size={48} opacity={0.3} />
               <h3>No items found</h3>

@@ -33,10 +33,9 @@ const getProductById = async (req, res) => {
 
 const createProduct = async (req, res) => {
   try {
-    const { name, category, price, stock, description, weight } = req.body;
+    const { name, category, price, stock, description, weight, is_veg, tags, is_available } = req.body;
     let imageUrl = '';
 
-    // If there's a file, upload it optimally to Cloudinary's fast CDN
     if (req.file) {
       const result = await cloudinary.uploader.upload(req.file.path, {
         folder: 'pickles',
@@ -48,10 +47,8 @@ const createProduct = async (req, res) => {
       imageUrl = result.secure_url;
     }
 
-    // Generate slug-based ID from name
     const id = name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
 
-    // 1. Insert Product (stock is in separate table)
     const { data: productData, error: productError } = await supabase
       .from('products')
       .insert([{ 
@@ -61,13 +58,15 @@ const createProduct = async (req, res) => {
         price: parseFloat(price), 
         description, 
         weight, 
-        image: imageUrl 
+        image: imageUrl,
+        is_veg: is_veg === 'true' || is_veg === true,
+        tags: Array.isArray(tags) ? tags : (tags ? tags.split(',').map(t => t.trim()) : []),
+        is_available: is_available === 'true' || is_available === true || is_available === undefined
       }])
       .select();
     
     if (productError) throw productError;
 
-    // 2. Initialize Stock entry
     const { error: stockError } = await supabase
       .from('stock')
       .upsert({ 
@@ -91,12 +90,11 @@ const addReview = async (req, res) => {
     const { id: product_id } = req.params;
     const { user_id, rating, comment, user_name } = req.body;
 
-    // 1. Double-Ring Verification: Check if user actually bought this product
     const { data: purchaseRecord, error: purchaseErr } = await supabase
       .from('orders')
       .select('id, status, order_items(product_id)')
       .eq('user_id', user_id)
-      .eq('status', 'delivered'); // Only delivered orders can be reviewed
+      .eq('status', 'delivered');
 
     if (purchaseErr) throw purchaseErr;
 
@@ -108,7 +106,6 @@ const addReview = async (req, res) => {
       return res.status(403).json({ error: "Only verified buyers who received the product can leave a review." });
     }
 
-    // 2. Submit review (hidden until admin approval)
     const { data, error } = await supabase
       .from('reviews')
       .insert([{ 
@@ -117,7 +114,7 @@ const addReview = async (req, res) => {
         user_name,
         rating, 
         comment, 
-        is_approved: false // Admin must approve in Middle Ring
+        is_approved: false 
       }])
       .select();
 
@@ -135,7 +132,7 @@ const getReviews = async (req, res) => {
       .from('reviews')
       .select('*')
       .eq('product_id', product_id)
-      .eq('is_approved', true) // Security: Only show approved reviews
+      .eq('is_approved', true) 
       .order('created_at', { ascending: false });
 
     if (error) throw error;
@@ -148,11 +145,19 @@ const getReviews = async (req, res) => {
 const updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, category, price, description, weight, is_veg, tags } = req.body;
-    let updateData = { name, category, price: parseFloat(price), description, weight, is_veg };
+    const { name, category, price, description, weight, is_veg, tags, is_available } = req.body;
+    let updateData = { 
+      name, 
+      category, 
+      price: parseFloat(price), 
+      description, 
+      weight, 
+      is_veg: is_veg === 'true' || is_veg === true,
+      is_available: is_available === 'true' || is_available === true
+    };
     
     if (tags) {
-      updateData.tags = Array.isArray(tags) ? tags : [tags];
+      updateData.tags = Array.isArray(tags) ? tags : tags.split(',').map(t => t.trim());
     }
 
     if (req.file) {

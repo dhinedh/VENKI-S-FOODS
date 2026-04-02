@@ -16,14 +16,13 @@ import LazyImage from '../components/LazyImage';
  * - Reviews Section: Fetch approved reviews from /api/reviews/:productId.
  * - Verified Buyer Form: If logged in, show review form. Submit to /api/reviews.
  */
-import productsData from '../data/products.json';
 
 const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const addItem = useCartStore((state) => state.addItem);
   
-  const [product, setProduct] = useState(productsData.find(p => String(p.id) === String(id)));
+  const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [qty, setQty] = useState(1);
   const [reviews, setReviews] = useState([]);
@@ -37,16 +36,15 @@ const ProductDetail = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      // 1. Double check dynamic product data if needed, but we already have mock
       try {
-        const { data: dynamicProd } = await api.get(`/products/${id}`);
-        if (dynamicProd) setProduct(dynamicProd);
+        setLoading(true);
+        const { data } = await api.get(`/products/${id}`);
+        setProduct(data);
       } catch (err) {
-        console.log("ProductDetail: Using stable mock fallback.");
+        console.error("ProductDetail: Error fetching product:", err);
       } finally {
         setLoading(false);
       }
-
 
       // 2. Fetch Reviews
       try {
