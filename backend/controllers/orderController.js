@@ -5,32 +5,13 @@ const { notifyAdmin } = require('../utils/whatsapp');
 
 const PRODUCTS_DATA_PATH = path.join(__dirname, '../data/products.json');
 
-// --- Helper: Validate Coupon ---
-const validateCouponLogic = async (code, subtotal) => {
-  const { data: coupon, error } = await supabase
-    .from('coupons')
-    .select('*')
-    .eq('code', code)
-    .eq('is_active', true)
-    .single();
-  
-  if (error || !coupon) return { error: "Invalid coupon" };
-
-  if (new Date(coupon.expires_at) < new Date()) return { error: "Coupon expired" };
-  if (coupon.used_count >= coupon.max_uses) return { error: "Coupon usage limit reached" };
-  if (subtotal < coupon.min_order_amount) return { error: `Min order ₹${coupon.min_order_amount} required` };
-
-  let discount = coupon.discount_type === 'percent' ? (subtotal * coupon.discount_value) / 100 : coupon.discount_value;
-  return { valid: true, discount, coupon };
-};
-
 // --- Controllers ---
 
 const createOrder = async (req, res) => {
   try {
     const { 
       user_id, customer_name, customer_phone, delivery_type, 
-      address, delivery_slot, items, coupon_code 
+      address, delivery_slot, items 
     } = req.body;
 
     // 1. Fetch delivery settings
@@ -48,8 +29,11 @@ const createOrder = async (req, res) => {
     const validatedItems = [];
 
     for (const item of items) {
-      const productInfo = productsData.find(p => p.id === item.id);
-      if (!productInfo) return res.status(400).json({ error: `Product ${item.id} not found.` });
+      const productInfo = productsData.find(p => String(p.id) === String(item.id));
+      if (!productInfo) {
+        console.warn(`[Order Validation Failed] Product not found: ${item.id}`);
+        return res.status(400).json({ error: `Product ${item.id} not found.` });
+      }
       
       const itemSubtotal = productInfo.price * item.qty;
       subtotal += itemSubtotal;
@@ -58,29 +42,15 @@ const createOrder = async (req, res) => {
       // Stock check
       const { data: stockData } = await supabase.from('stock').select('quantity').eq('product_id', item.id).single();
       if (!stockData || stockData.quantity < item.qty) {
+        console.warn(`[Order Validation Failed] Insufficient stock for ${productInfo.name}: Requested ${item.qty}, available ${stockData?.quantity || 0}`);
         return res.status(400).json({ error: `Insufficient stock for ${productInfo.name}` });
       }
-    }
-
-    // 3. Min Order Validation
-    if (subtotal < settings.min_order_amount) {
-      return res.status(400).json({ error: `Minimum order amount is ₹${settings.min_order_amount}` });
     }
 
     // 4. Delivery Charge
     let delivery_charge = (delivery_type === 'delivery' && subtotal < settings.free_above) ? settings.delivery_charge : 0;
 
-    // 5. Coupon
-    let discount = 0;
-    if (coupon_code) {
-      const v = await validateCouponLogic(coupon_code, subtotal);
-      if (v.error) return res.status(400).json({ error: v.error });
-      discount = v.discount;
-      // Increment usage
-      await supabase.from('coupons').update({ used_count: v.coupon.used_count + 1 }).eq('code', coupon_code);
-    }
-
-    const total_price = subtotal + delivery_charge - discount;
+    const total_price = subtotal + Number(delivery_charge);
 
     // 6. Insert Order
     const { data: order, error: orderError } = await supabase
@@ -88,7 +58,7 @@ const createOrder = async (req, res) => {
       .insert([{
         user_id, customer_name, customer_phone, delivery_type,
         address, delivery_slot, items: validatedItems, subtotal,
-        delivery_charge, discount, total_price, coupon_code,
+        delivery_charge, total_price,
         status: 'pending'
       }])
       .select().single();
@@ -108,13 +78,6 @@ const createOrder = async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
-};
-
-const validateCoupon = async (req, res) => {
-  const { code, subtotal } = req.body;
-  const result = await validateCouponLogic(code, subtotal);
-  if (result.error) return res.status(400).json({ error: result.error });
-  res.json(result);
 };
 
 const getOrderById = async (req, res) => {
@@ -154,7 +117,6 @@ const updateOrderStatus = async (req, res) => {
 
 module.exports = { 
   createOrder, 
-  validateCoupon, 
   getOrdersByUser, 
   getOrderById, 
   getAllOrders, 

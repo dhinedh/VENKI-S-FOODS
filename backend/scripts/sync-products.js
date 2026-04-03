@@ -17,8 +17,11 @@ const syncProducts = async () => {
     for (const prod of products) {
       console.log(`👉 Syncing: ${prod.name}...`);
       
+      // Generate slug-based ID (Harmonized with Controller)
+      const slugId = prod.name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
+
       const productData = {
-        id: prod.id,
+        id: slugId, // Use SLUG instead of numeric ID
         name: prod.name,
         category: prod.category,
         price: prod.price,
@@ -26,6 +29,7 @@ const syncProducts = async () => {
         description: prod.description || '',
         weight: prod.weight || '250g',
         is_veg: prod.is_veg ?? true,
+        is_available: prod.is_available ?? true,
         tags: prod.tags || []
       };
 
@@ -36,12 +40,25 @@ const syncProducts = async () => {
 
       if (error) throw error;
 
-      // 2. Sync Stock Table (default to some stock if not exists)
+      // 2. Cleanup: If we're using slugs, we should delete the old numeric ID
+      if (String(prod.id).match(/^\d+$/)) {
+        await supabase
+          .from('products')
+          .delete()
+          .eq('id', String(prod.id));
+          
+        await supabase
+          .from('stock')
+          .delete()
+          .eq('product_id', String(prod.id));
+      }
+
+      // 3. Sync Stock Table
       const { error: stockError } = await supabase
         .from('stock')
         .upsert({ 
-          product_id: prod.id, 
-          quantity: 20 // Default stock for migration
+          product_id: slugId, 
+          quantity: 20 
         }, { onConflict: 'product_id' });
 
       if (stockError) throw stockError;

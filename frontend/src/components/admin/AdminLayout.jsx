@@ -89,7 +89,16 @@ const AdminLayout = ({ children, title = "Admin Management" }) => {
                     to { opacity: 1; transform: translateY(0); }
                 }
 
-                @media (max-width: 991px) {
+                @media (max-width: 768px) {
+                    .admin-layout-container { flex-direction: column; }
+                    .admin-main-content {
+                        padding: 70px 12px 90px 12px; /* top bar + bottom nav clearance */
+                        gap: 16px;
+                    }
+                    .admin-top-bar { display: none; } /* replaced by mobile top bar in sidebar */
+                }
+
+                @media (min-width: 769px) and (max-width: 991px) {
                     .admin-main-content { padding: 15px; }
                     .admin-top-bar { padding: 0.8rem 1.2rem; }
                     .top-bar-info { gap: 1rem; }

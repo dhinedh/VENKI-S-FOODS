@@ -1,8 +1,9 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Plus, Star, Eye } from 'lucide-react';
 import useCartStore from '../store/cartStore';
+import { supabase } from '../lib/supabase';
 import LazyImage from './LazyImage';
 
 /**
@@ -16,10 +17,16 @@ import LazyImage from './LazyImage';
  */
 const FoodCard = ({ product }) => {
   const addItem = useCartStore((state) => state.addItem);
+  const navigate = useNavigate();
 
-  const handleAddToCart = (e) => {
+  const handleAddToCart = async (e) => {
     e.preventDefault();
     e.stopPropagation();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      navigate('/login');
+      return;
+    }
     addItem({ ...product });
   };
 

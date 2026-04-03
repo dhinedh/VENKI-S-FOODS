@@ -1,95 +1,116 @@
 [
   {
-    "id": 1,
-    "name": "Classic Mango Pickle",
-    "category": "Pickles",
-    "tags": ["Traditional", "Spicy", "Best Seller"],
+    "id": "andhra-parupu-podi",
+    "name": "Andhra Parupu Podi",
+    "category": "podi",
+    "tags": [
+      "veg",
+      "spicy",
+      "andhra"
+    ],
     "is_veg": true,
+    "weight": "100gm",
+    "price": 75,
+    "description": "Authentic Andhra-style lentil podi. Perfect with hot rice and ghee. Keep refrigerated.",
+    "image": "/products/andhra-parupu-podi.jpg",
+    "is_available": true
+  },
+  {
+    "id": "thakali-thokku",
+    "name": "Thakali Thokku",
+    "category": "thokku",
+    "tags": [
+      "veg",
+      "tangy",
+      "tomato"
+    ],
+    "is_veg": true,
+    "weight": "250gm",
+    "price": 130,
+    "description": "Tangy tomato thokku made the traditional way. Goes well with idli, dosa and rice. Keep refrigerated.",
+    "image": "/products/thakkali-thokku.jpg",
+    "is_available": true
+  },
+  {
+    "id": "nellai-ellu-idli-podi",
+    "name": "Nellai Ellu Idli Podi",
+    "category": "podi",
+    "tags": [
+      "veg",
+      "sesame",
+      "nellai",
+      "bestseller"
+    ],
+    "is_veg": true,
+    "weight": "100gm",
+    "price": 100,
+    "description": "Nellai-style sesame idli podi with a rich, nutty flavour. A bestseller. Keep refrigerated.",
+    "image": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&q=80&w=600",
+    "is_available": true
+  },
+  {
+    "id": "vathal-kulambu",
+    "name": "Vathal Kulambu",
+    "category": "kulambu",
+    "tags": [
+      "veg",
+      "spicy",
+      "traditional"
+    ],
+    "is_veg": true,
+    "weight": "250gm",
     "price": 199,
-    "originalPrice": 249,
-    "description": "Traditional sun-dried mangoes marinated in cold-pressed sesame oil and hand-ground spices.",
-    "image": "https://res.cloudinary.com/venkis-foods/image/upload/q_auto,f_auto,w_400/v1/pickles/mango.webp",
+    "description": "Traditional Vathal Kulambu with sun-dried vegetables and tamarind base. Heat and serve. Keep refrigerated.",
+    "image": "/products/vathal-kulambu.jpg",
     "is_available": true
   },
   {
-    "id": 2,
-    "name": "Spicy Lemon Thokku",
-    "category": "Pickles",
-    "tags": ["Tangy", "Zesty"],
-    "is_veg": true,
-    "price": 179,
-    "description": "A zesty explosion of salt-cured lemons with a hint of green chilies and ginger.",
-    "image": "https://res.cloudinary.com/venkis-foods/image/upload/q_auto,f_auto,w_400/v1/pickles/lemon.webp",
-    "is_available": true
-  },
-  {
-    "id": 3,
-    "name": "Authentic Chicken Pickle",
-    "category": "Meat Specials",
-    "tags": ["Non-Veg", "Protein Rich", "Signature"],
+    "id": "chicken-pickle",
+    "name": "Chicken Pickle",
+    "category": "pickle",
+    "tags": [
+      "non-veg",
+      "spicy",
+      "pickle"
+    ],
     "is_veg": false,
-    "price": 499,
-    "originalPrice": 599,
-    "description": "Boneless chicken chunks fried to perfection and blended with our signature masala.",
-    "image": "https://res.cloudinary.com/venkis-foods/image/upload/q_auto,f_auto,w_400/v1/pickles/chicken.webp",
+    "weight": "250gm",
+    "price": 250,
+    "description": "Spicy homemade chicken pickle with authentic masala. Keep refrigerated.",
+    "image": "/products/chicken-pickle.jpg",
     "is_available": true
   },
   {
-    "id": 4,
-    "name": "Royyala Pachadi (Prawns)",
-    "category": "Meat Specials",
-    "tags": ["Seafood", "Coastal Style"],
+    "id": "fish-pickle",
+    "name": "Fish Pickle",
+    "category": "pickle",
+    "tags": [
+      "non-veg",
+      "spicy",
+      "pickle"
+    ],
     "is_veg": false,
-    "price": 599,
-    "description": "Coastal style prawn pickle made with catch-of-the-day prawns and slow-roasted spices.",
-    "image": "https://res.cloudinary.com/venkis-foods/image/upload/q_auto,f_auto,w_400/v1/pickles/prawns.webp",
+    "weight": "250gm",
+    "price": 250,
+    "description": "Tangy and spicy fish pickle made fresh at home. Keep refrigerated.",
+    "image": "/products/fish-pickle.jpg",
     "is_available": true
   },
   {
-    "id": 5,
-    "name": "Garlic (Velulli) Pickle",
-    "category": "Pickles",
-    "tags": ["Immunity", "Bold Flavor"],
-    "is_veg": true,
-    "price": 249,
-    "originalPrice": 299,
-    "description": "Concentrated velulli (garlic) cloves slow-cooked with tamarind and red chilies.",
-    "image": "https://res.cloudinary.com/venkis-foods/image/upload/q_auto,f_auto,w_400/v1/pickles/garlic.webp",
-    "is_available": true
-  },
-  {
-    "id": 6,
-    "name": "Inji Puli (Ginger Tamarind)",
-    "category": "Pickles",
-    "tags": ["Sweet & Sour", "Digestive"],
-    "is_veg": true,
-    "price": 189,
-    "description": "Finely shredded ginger balanced with jaggery and sour tamarind.",
-    "image": "https://res.cloudinary.com/venkis-foods/image/upload/q_auto,f_auto,w_400/v1/pickles/ginger.webp",
-    "is_available": true
-  },
-  {
-    "id": 7,
-    "name": "Veg Heritage Combo",
-    "category": "Combos",
-    "tags": ["Bundle", "Veg Supreme"],
-    "is_veg": true,
-    "price": 549,
-    "originalPrice": 699,
-    "description": "The ultimate veg trio: Classic Mango, Spicy Lemon, and Velulli Garlic. 250g each.",
-    "image": "https://images.unsplash.com/photo-1599481238640-4c1288750d7a?auto=format&fit=crop&q=80&w=400",
-    "is_available": true
-  },
-  {
-    "id": 8,
-    "name": "Non-Veg Protein Pack",
-    "category": "Combos",
-    "tags": ["Meat Lover", "Best Value"],
+    "id": "prawn-pickle",
+    "name": "Prawn Pickle",
+    "category": "pickle",
+    "tags": [
+      "non-veg",
+      "spicy",
+      "pickle",
+      "premium"
+    ],
     "is_veg": false,
-    "price": 999,
-    "originalPrice": 1199,
-    "description": "Signature Chicken Pickle + Royyala Pachadi (Prawns). The perfect meat lover's gift.",
-    "image": "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&q=80&w=400",
+    "weight": "250gm",
+    "price": 320,
+    "description": "Premium prawn pickle marinated in special spices. A true seafood lover's delight. Keep refrigerated.",
+    "image": "/products/prawn-pickle.jpg",
     "is_available": true
   }
 ]

@@ -33,7 +33,7 @@ const getProductById = async (req, res) => {
 
 const createProduct = async (req, res) => {
   try {
-    const { name, category, price, stock, description, weight } = req.body;
+    const { name, category, price, stock, description, weight, is_available } = req.body;
     let imageUrl = '';
 
     // If there's a file, upload it optimally to Cloudinary's fast CDN
@@ -61,6 +61,7 @@ const createProduct = async (req, res) => {
         price: parseFloat(price), 
         description, 
         weight, 
+        is_available: is_available !== undefined ? is_available : true,
         image: imageUrl 
       }])
       .select();
@@ -148,8 +149,8 @@ const getReviews = async (req, res) => {
 const updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, category, price, description, weight, is_veg, tags } = req.body;
-    let updateData = { name, category, price: parseFloat(price), description, weight, is_veg };
+    const { name, category, price, description, weight, is_veg, tags, is_available } = req.body;
+    let updateData = { name, category, price: parseFloat(price), description, weight, is_veg, is_available };
     
     if (tags) {
       updateData.tags = Array.isArray(tags) ? tags : [tags];

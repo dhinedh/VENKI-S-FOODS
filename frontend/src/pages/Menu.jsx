@@ -10,7 +10,7 @@ const Menu = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const initialCategory = searchParams.get('category') || 'All';
   
-  const [products] = useState(productsData);
+  const [products, setProducts] = useState(productsData);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState(initialCategory);
@@ -56,6 +56,21 @@ const Menu = () => {
       setActiveCategory(cat);
     }
   }, [searchParams]);
+
+  // HYDRATION: Sync with live database in background
+  useEffect(() => {
+    const syncLiveProducts = async () => {
+      try {
+        const { data } = await api.get('/products');
+        if (data && data.length > 0) {
+          setProducts(data);
+        }
+      } catch (err) {
+        console.warn("Menu Hydration: Sync failed, using local JSON.");
+      }
+    };
+    syncLiveProducts();
+  }, []);
 
   const handleCategoryChange = (cat) => {
     setActiveCategory(cat);
@@ -287,6 +302,9 @@ const Menu = () => {
         }
 
         @media (max-width: 768px) {
+          .menu-controls { padding: 1rem; gap: 1rem; }
+          .search-box { flex: 1.5; min-width: 140px; }
+          .mobile-filter-btn { flex: 1; padding: 10px; font-size: 0.9rem; }
           .desktop-controls { display: none; }
           .mobile-filter-btn { display: flex; }
           .grid-3 { grid-template-columns: repeat(2, 1fr); gap: 1rem; }

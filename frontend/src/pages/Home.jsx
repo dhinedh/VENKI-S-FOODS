@@ -5,11 +5,26 @@ import { ShoppingBag, ChevronRight, Heart, ShieldCheck, Star, Award, Truck, Mail
 import FoodCard from '../components/FoodCard';
 import SEOHead from '../components/SEOHead';
 import productsData from '../data/products.json';
+import api from '../lib/api';
 
 const Home = () => {
-  // Always use local products.json — it has the real branded images
-  // The API may contain older/different DB records without images
-  const products = productsData;
+  // HYDRATION PATTERN: Use local JSON for instant render, then sync from API
+  const [products, setProducts] = React.useState(productsData);
+
+  React.useEffect(() => {
+    const syncData = async () => {
+      try {
+        const { data } = await api.get('/products');
+        if (data && data.length > 0) {
+          // Update state with live data from DB (Admin changes)
+          setProducts(data);
+        }
+      } catch (err) {
+        console.warn("Home Sync: Using local fallback.");
+      }
+    };
+    syncData();
+  }, []);
 
   // Prioritise products with local branded images (non-unsplash)
   const featured = products
@@ -93,34 +108,26 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Heritage Stats Ribbon */}
-      <section className="stats-ribbon glass-card container mb-10">
-        <div className="stats-grid">
-          <div className="stat-item">
-            <Award size={24} color="var(--primary-gold)" />
-            <div>
-              <h4>40+ Years</h4>
-              <p>Culinary Legacy</p>
+      {/* Trust Marquee — Premium Animated Ticker */}
+      <div className="trust-marquee-wrap">
+        <div className="trust-marquee-track">
+          {/* Duplicate items for seamless loop */}
+          {[...Array(2)].map((_, i) => (
+            <div key={i} className="trust-marquee-inner">
+              <span className="marquee-item"><Award size={14} className="mq-icon"/> <b>40+ Years</b> Culinary Legacy</span>
+              <span className="marquee-sep">✦</span>
+              <span className="marquee-item"><ShieldCheck size={14} className="mq-icon"/> <b>100% Natural</b> No Preservatives</span>
+              <span className="marquee-sep">✦</span>
+              <span className="marquee-item"><Truck size={14} className="mq-icon"/> <b>Pan-India</b> Fast Delivery</span>
+              <span className="marquee-sep">✦</span>
+              <span className="marquee-item"><Star size={14} className="mq-icon"/> <b>5000+</b> Happy Customers</span>
+              <span className="marquee-sep">✦</span>
+              <span className="marquee-item"><Heart size={14} className="mq-icon"/> <b>Handcrafted</b> With Love Since 1984</span>
+              <span className="marquee-sep">✦</span>
             </div>
-          </div>
-          <div className="stat-divider"></div>
-          <div className="stat-item">
-            <ShieldCheck size={24} color="var(--primary-gold)" />
-            <div>
-              <h4>100% Natural</h4>
-              <p>Preservative Free</p>
-            </div>
-          </div>
-          <div className="stat-divider"></div>
-          <div className="stat-item">
-            <Truck size={24} color="var(--primary-gold)" />
-            <div>
-              <h4>Pan-India</h4>
-              <p>Direct Delivery</p>
-            </div>
-          </div>
+          ))}
         </div>
-      </section>
+      </div>
       
       {/* Featured Selection */}
       <section className="featured-products section-padding">
@@ -147,7 +154,7 @@ const Home = () => {
       <section className="heritage-split section-padding">
         <div className="container split-grid">
           <div className="split-img glass-card overflow-hidden">
-            <img src="/images/image.png" alt="Ingredients" />
+            <img src="/products/logo.png" alt="Ingredients" />
           </div>
           <div className="split-content">
             <span className="section-label">Our Philosophy</span>
@@ -336,13 +343,73 @@ const Home = () => {
         .phi-item h4 { font-size: 1.2rem; margin: 10px 0 5px; color: var(--text-primary); }
         .phi-item p { font-size: 0.85rem; color: var(--text-secondary); }
 
-        /* New High-Conversion Sections */
-        .stats-ribbon { margin-top: -40px; }
-        .stats-grid { display: flex; justify-content: space-around; padding: 2.5rem; align-items: center; }
-        .stat-item { display: flex; align-items: center; gap: 1rem; }
-        .stat-item h4 { font-size: 1.1rem; margin: 0; }
-        .stat-item p { font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; }
-        .stat-divider { width: 1px; height: 40px; background: var(--border-glass); }
+        /* ── Premium Marquee Ticker ── */
+        .trust-marquee-wrap {
+          overflow: hidden;
+          border-top: 1px solid rgba(212,175,55,0.15);
+          border-bottom: 1px solid rgba(212,175,55,0.15);
+          background: rgba(212,175,55,0.04);
+          padding: 10px 0;
+          margin-bottom: 2rem;
+          position: relative;
+        }
+        .trust-marquee-wrap::before,
+        .trust-marquee-wrap::after {
+          content: '';
+          position: absolute;
+          top: 0; bottom: 0;
+          width: 60px;
+          z-index: 2;
+          pointer-events: none;
+        }
+        .trust-marquee-wrap::before {
+          left: 0;
+          background: linear-gradient(to right, var(--bg-dark, #0a0a0a), transparent);
+        }
+        .trust-marquee-wrap::after {
+          right: 0;
+          background: linear-gradient(to left, var(--bg-dark, #0a0a0a), transparent);
+        }
+        .trust-marquee-track {
+          display: flex;
+          width: max-content;
+          animation: marquee-scroll 22s linear infinite;
+        }
+        .trust-marquee-track:hover { animation-play-state: paused; }
+        .trust-marquee-inner {
+          display: flex;
+          align-items: center;
+          gap: 0;
+          white-space: nowrap;
+          flex-shrink: 0;
+        }
+        .marquee-item {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          font-size: 0.78rem;
+          font-weight: 500;
+          color: rgba(255,255,255,0.65);
+          padding: 0 20px;
+          letter-spacing: 0.3px;
+        }
+        .marquee-item b {
+          color: var(--primary-gold);
+          font-weight: 800;
+        }
+        .marquee-item .mq-icon {
+          color: var(--primary-gold);
+          flex-shrink: 0;
+        }
+        .marquee-sep {
+          color: rgba(212,175,55,0.35);
+          font-size: 0.6rem;
+          flex-shrink: 0;
+        }
+        @keyframes marquee-scroll {
+          from { transform: translateX(0); }
+          to   { transform: translateX(-50%); }
+        }
 
         .process-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2.5rem; }
         .process-card { padding: 3.5rem 2.5rem; text-align: center; position: relative; }

@@ -11,7 +11,6 @@ const {
 } = require('../controllers/orderController');
 
 router.post('/', createOrder);
-router.post('/validate-coupon', validateCoupon);
 router.get('/', adminAuth, getAllOrders); 
 router.get('/user/:userId', getOrdersByUser);
 router.get('/history/:userId', getOrdersByUser); // Alias for legacy/frontend compatibility

@@ -136,19 +136,19 @@ const ProductManager = () => {
             
             <div className="admin-header">
                 <div>
-                    <Link to="/admin" className="back-link"><ArrowLeft size={18}/> Dashboard</Link>
+                    <Link to="/admin" className="back-link"><ArrowLeft size={16}/> Dashboard</Link>
                     <h1 className="mt-2">Product <span>Catalog</span></h1>
                 </div>
-                <div className="flex gap-4 items-center">
-                    <div className="search-bar glass-card">
-                        <Search size={18}/>
+                <div className="header-controls">
+                    <div className="pm-search-bar">
+                        <Search size={18} className="search-icon"/>
                         <input 
-                            type="text" placeholder="Search product..." 
+                            type="text" placeholder="Search products..." 
                             value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
                         />
                     </div>
-                    <button className="btn btn-primary" onClick={handleAddNew}>
-                        <Plus size={18}/> ADD NEW
+                    <button className="btn btn-primary add-btn" onClick={handleAddNew}>
+                        <Plus size={18}/> Add Product
                     </button>
                 </div>
             </div>
@@ -253,69 +253,85 @@ const ProductManager = () => {
             )}
 
             <style>{`
-                .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; }
+                /* Mobile-first */
+                .admin-header { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem; }
+                .admin-header h1 { font-size: 1.6rem; }
                 .admin-header h1 span { color: var(--primary-gold); }
                 .back-link { display: flex; align-items: center; gap: 8px; color: var(--text-secondary); font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; }
                 .back-link:hover { color: var(--primary-gold); }
-                
-                .admin-header .flex { gap: 1.5rem; }
-                .search-bar { display: flex; align-items: center; gap: 12px; padding: 12px 20px; border-radius: var(--radius-md); border: 1px solid var(--border-glass); background: rgba(255, 255, 255, 0.03) !important; flex-direction: row !important; min-width: 300px; }
-                .search-bar input { background: none; border: none; color: #fff; font-family: inherit; font-size: 0.95rem; width: 100%; }
-                .search-bar input:focus { outline: none; }
-                .search-bar svg { color: var(--primary-gold); }
+
+                /* Fixed search bar — explicit row layout to beat glass-card override */
+                .header-controls { display: flex; flex-direction: column; gap: 1rem; width: 100%; }
+                .pm-search-bar {
+                    display: flex !important; flex-direction: row !important;
+                    align-items: center; gap: 12px; padding: 13px 16px;
+                    border-radius: var(--radius-md); border: 1px solid var(--border-glass);
+                    background: rgba(255,255,255,0.04);
+                    transition: 0.3s;
+                }
+                .pm-search-bar:focus-within { border-color: rgba(212,175,55,0.4); background: rgba(212,175,55,0.03); }
+                .pm-search-bar .search-icon { color: var(--primary-gold); flex-shrink: 0; }
+                .pm-search-bar input { background: none; border: none; color: #fff; font-family: inherit; font-size: 0.95rem; width: 100%; outline: none; }
+                .pm-search-bar input::placeholder { color: rgba(255,255,255,0.3); }
+                .add-btn { width: 100%; justify-content: center; }
 
                 /* Accessibility Fix: Gold buttons need dark text for contrast */
                 .btn-primary { color: #000 !important; font-weight: 800 !important; }
                 
-                .product-table-wrapper { border-radius: var(--radius-lg); border: 1px solid var(--border-glass); background: rgba(18, 18, 18, 0.4); }
-                .admin-table { width: 100%; border-collapse: collapse; }
-                .admin-table th { text-align: left; padding: 1.2rem; border-bottom: 1px solid var(--border-glass); color: var(--text-secondary); text-transform: uppercase; font-size: 0.7rem; letter-spacing: 1.5px; font-weight: 800; }
-                .admin-table td { padding: 1.2rem; border-bottom: 1px solid var(--border-glass); font-size: 0.95rem; color: #eee; }
+                .product-table-wrapper { border-radius: var(--radius-lg); border: 1px solid var(--border-glass); background: rgba(18, 18, 18, 0.4); overflow-x: auto; -webkit-overflow-scrolling: touch; }
+                .admin-table { width: 100%; border-collapse: collapse; min-width: 500px; }
+                .admin-table th { text-align: left; padding: 1rem; border-bottom: 1px solid var(--border-glass); color: var(--text-secondary); text-transform: uppercase; font-size: 0.7rem; letter-spacing: 1.5px; font-weight: 800; white-space: nowrap; }
+                .admin-table td { padding: 1rem; border-bottom: 1px solid var(--border-glass); font-size: 0.9rem; color: #eee; }
                 .admin-table tr:last-child td { border-bottom: none; }
                 .admin-table tr:hover { background: rgba(212, 175, 55, 0.02); }
-                
-                .admin-table td strong { color: #fff; display: block; max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+                .admin-table td strong { color: #fff; display: block; max-width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-                .table-img { width: 50px; height: 50px; border-radius: 10px; overflow: hidden; border: 1px solid var(--border-glass); }
+                .table-img { width: 44px; height: 44px; border-radius: 10px; overflow: hidden; border: 1px solid var(--border-glass); }
                 .table-img img { width: 100%; height: 100%; object-fit: cover; }
                 
-                .badge { background: rgba(212, 175, 55, 0.1); color: var(--primary-gold); padding: 4px 12px; border-radius: 20px; font-weight: 800; font-size: 0.65rem; border: 1px solid rgba(212, 175, 55, 0.2); text-transform: uppercase; letter-spacing: 0.5px; }
+                .badge { background: rgba(212, 175, 55, 0.1); color: var(--primary-gold); padding: 4px 10px; border-radius: 20px; font-weight: 800; font-size: 0.6rem; border: 1px solid rgba(212, 175, 55, 0.2); text-transform: uppercase; letter-spacing: 0.5px; }
                 
-                .actions { display: flex; gap: 12px; }
+                .actions { display: flex; gap: 10px; }
                 .action-btn { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; transition: 0.3s; border: 1px solid transparent; }
-                .action-btn:hover { transform: translateY(-2px); }
                 .action-btn.edit { background: rgba(64,196,255,0.1); color: #40c4ff; }
                 .action-btn.edit:hover { border-color: rgba(64,196,255,0.3); }
                 .action-btn.delete { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
                 .action-btn.delete:hover { border-color: rgba(239, 68, 68, 0.3); }
                 
-                .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); z-index: 4000; display: flex; align-items: center; justify-content: center; padding: 20px; }
-                .modal-content { max-width: 650px; width: 100%; padding: 3rem; border: 1px solid var(--border-gold); }
-                .modal-header h3 { font-family: var(--font-serif); font-size: 1.6rem; color: #fff; margin:0; }
-                .modal-header button { color: var(--text-secondary); transition: 0.3s; }
+                /* Modal: bottom sheet on mobile */
+                .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); z-index: 4000; display: flex; align-items: flex-end; justify-content: center; padding: 0; }
+                .modal-content { max-width: 700px; width: 100%; padding: 2rem 1.5rem; border: 1px solid var(--border-gold); border-radius: var(--radius-lg) var(--radius-lg) 0 0; max-height: 90vh; overflow-y: auto; }
+                .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+                .modal-header h3 { font-family: var(--font-serif); font-size: 1.4rem; color: #fff; margin:0; }
+                .modal-header button { color: var(--text-secondary); transition: 0.3s; padding: 8px; }
                 .modal-header button:hover { color: #fff; }
                 
-                .admin-form .form-row { display: flex; gap: 1.5rem; }
-                .form-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 1.5rem; }
+                .admin-form .form-row { display: flex; flex-direction: column; gap: 0; }
+                .form-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1.25rem; }
                 .form-group label { font-size: 0.75rem; font-weight: 800; color: var(--primary-gold); text-transform: uppercase; letter-spacing: 1px; }
                 .form-group input, .form-group select, .form-group textarea { background: rgba(255,255,255,0.03); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 14px; color: #fff; font-family: inherit; transition: 0.3s; }
                 .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--primary-gold); background: rgba(212, 175, 55, 0.05); }
                 
-                .file-input { display: flex; align-items: center; gap: 1rem; padding: 14px; position: relative; border-radius: var(--radius-md); cursor: pointer; transition: 0.3s; }
+                .file-input { display: flex; align-items: center; gap: 1rem; padding: 14px; position: relative; border-radius: var(--radius-md); cursor: pointer; transition: 0.3s; border: 1px solid var(--border-glass); }
                 .file-input:hover { border-color: var(--primary-gold); background: rgba(212, 175, 55, 0.05); }
                 .file-input input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
                 .file-input svg { color: var(--primary-gold); }
                 
-                .modal-actions { display: flex; justify-content: flex-end; gap: 1rem; margin-top: 2rem; }
+                /* Full-width buttons in modal on mobile */
+                .modal-actions { display: flex; gap: 1rem; margin-top: 1.5rem; }
+                .modal-actions button { flex: 1; padding: 14px; }
 
-                @media (max-width: 768px) {
-                  .admin-header { flex-direction: column; align-items: flex-start; gap: 1.5rem; }
-                  .admin-header .flex { flex-direction: column; width: 100%; gap: 1rem; align-items: stretch; }
-                  .search-bar { min-width: 0; }
-                  .admin-table th:nth-child(3), .admin-table td:nth-child(3),
-                  .admin-table th:nth-child(5), .admin-table td:nth-child(5) { display: none; }
-                  .modal-content { padding: 2rem 1.5rem; }
-                  .admin-form .form-row { flex-direction: column; gap: 0; }
+                /* Desktop enhancements */
+                @media (min-width: 768px) {
+                  .admin-header { flex-direction: row; justify-content: space-between; align-items: center; gap: 0; }
+                  .header-controls { flex-direction: row; width: auto; gap: 1.5rem; align-items: center; }
+                  .add-btn { width: auto; }
+                  .pm-search-bar { min-width: 260px; }
+                  .admin-form .form-row { flex-direction: row; gap: 1.5rem; }
+                  .modal-overlay { align-items: center; padding: 20px; }
+                  .modal-content { border-radius: var(--radius-lg); padding: 3rem; max-height: none; }
+                  .modal-actions { justify-content: flex-end; }
+                  .modal-actions button { flex: none; }
                 }
             `}</style>
         </div>

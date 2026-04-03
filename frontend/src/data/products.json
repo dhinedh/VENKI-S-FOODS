@@ -1,21 +1,29 @@
 [
   {
-    "id": "1",
+    "id": "andhra-parupu-podi",
     "name": "Andhra Parupu Podi",
     "category": "podi",
-    "tags": ["veg", "spicy", "andhra"],
+    "tags": [
+      "veg",
+      "spicy",
+      "andhra"
+    ],
     "is_veg": true,
     "weight": "100gm",
     "price": 75,
     "description": "Authentic Andhra-style lentil podi. Perfect with hot rice and ghee. Keep refrigerated.",
-    "image": "/products/andhra-parupu-podi.jpg",
+    "image": "/products/paupu podi.png",
     "is_available": true
   },
   {
-    "id": "2",
+    "id": "thakali-thokku",
     "name": "Thakali Thokku",
     "category": "thokku",
-    "tags": ["veg", "tangy", "tomato"],
+    "tags": [
+      "veg",
+      "tangy",
+      "tomato"
+    ],
     "is_veg": true,
     "weight": "250gm",
     "price": 130,
@@ -24,22 +32,31 @@
     "is_available": true
   },
   {
-    "id": "3",
+    "id": "nellai-ellu-idli-podi",
     "name": "Nellai Ellu Idli Podi",
     "category": "podi",
-    "tags": ["veg", "sesame", "nellai", "bestseller"],
+    "tags": [
+      "veg",
+      "sesame",
+      "nellai",
+      "bestseller"
+    ],
     "is_veg": true,
     "weight": "100gm",
     "price": 100,
     "description": "Nellai-style sesame idli podi with a rich, nutty flavour. A bestseller. Keep refrigerated.",
-    "image": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&q=80&w=600",
+    "image": "/products/nellai elu.png",
     "is_available": true
   },
   {
-    "id": "4",
+    "id": "vathal-kulambu",
     "name": "Vathal Kulambu",
     "category": "kulambu",
-    "tags": ["veg", "spicy", "traditional"],
+    "tags": [
+      "veg",
+      "spicy",
+      "traditional"
+    ],
     "is_veg": true,
     "weight": "250gm",
     "price": 199,
@@ -48,10 +65,14 @@
     "is_available": true
   },
   {
-    "id": "5",
+    "id": "chicken-pickle",
     "name": "Chicken Pickle",
     "category": "pickle",
-    "tags": ["non-veg", "spicy", "pickle"],
+    "tags": [
+      "non-veg",
+      "spicy",
+      "pickle"
+    ],
     "is_veg": false,
     "weight": "250gm",
     "price": 250,
@@ -60,10 +81,14 @@
     "is_available": true
   },
   {
-    "id": "6",
+    "id": "fish-pickle",
     "name": "Fish Pickle",
     "category": "pickle",
-    "tags": ["non-veg", "spicy", "pickle"],
+    "tags": [
+      "non-veg",
+      "spicy",
+      "pickle"
+    ],
     "is_veg": false,
     "weight": "250gm",
     "price": 250,
@@ -72,10 +97,15 @@
     "is_available": true
   },
   {
-    "id": "7",
+    "id": "prawn-pickle",
     "name": "Prawn Pickle",
     "category": "pickle",
-    "tags": ["non-veg", "spicy", "pickle", "premium"],
+    "tags": [
+      "non-veg",
+      "spicy",
+      "pickle",
+      "premium"
+    ],
     "is_veg": false,
     "weight": "250gm",
     "price": 320,

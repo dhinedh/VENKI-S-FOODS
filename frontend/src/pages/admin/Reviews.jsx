@@ -76,12 +76,12 @@ const AdminReviews = () => {
 
       <div className="admin-header">
         <div>
-          <Link to="/admin" className="back-link"><ArrowLeft size={18}/> Back to Dashboard</Link>
-          <h1 className="mt-2 text-3xl font-bold">Review <span>Moderation</span></h1>
+          <Link to="/admin" className="back-link"><ArrowLeft size={16}/> Dashboard</Link>
+          <h1 className="mt-2">Review <span>Moderation</span></h1>
         </div>
-        <div className="stats-pill glass-card">
-           <MessageSquare size={18} color="var(--primary-color)"/>
-           <span>{reviews.length} Pending Approvals</span>
+        <div className="stats-pill-row">
+           <MessageSquare size={18} className="pill-icon"/>
+           <span className="pill-text">{reviews.length} Pending</span>
         </div>
       </div>
 
@@ -141,28 +141,53 @@ const AdminReviews = () => {
       </main>
 
       <style>{`
-        .admin-header { display: flex; justify-content: space-between; align-items: flex-end; }
-        .back-link { display: flex; align-items: center; gap: 8px; font-weight: 600; color: var(--text-secondary); }
-        .stats-pill { display: flex; align-items: center; gap: 10px; padding: 10px 20px; border-radius: 40px; font-weight: 700; font-size: 0.9rem; }
+        /* Mobile-first */
+        .admin-header { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem; }
+        .admin-header h1 { font-size: 1.6rem; }
+        .admin-header h1 span { color: var(--primary-gold); }
+        .back-link { display: flex; align-items: center; gap: 8px; font-weight: 600; color: var(--text-secondary); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; }
+        .back-link:hover { color: var(--primary-gold); }
 
-        .reviews-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 2rem; }
-        .review-mod-card { padding: 2.5rem; display: flex; flex-direction: column; }
-        
-        .rm-header { display: flex; justify-content: space-between; align-items: flex-start; }
-        .rm-title h3 { font-size: 1.1rem; margin-top: 4px; }
-        
-        .comment { font-style: italic; font-size: 1.1rem; color: var(--text-primary); margin-bottom: 1rem; border-left: 3px solid var(--primary-glow); padding-left: 1rem; }
-        .author-info { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-glass); padding-top: 1rem; }
-        
-        .rm-actions { display: flex; gap: 1rem; }
-        .flex-1 { flex: 1; justify-content: center; }
+        /* Fixed pill with explicit flex-row */
+        .stats-pill-row {
+            display: flex !important; flex-direction: row !important;
+            align-items: center; gap: 8px;
+            padding: 8px 16px; border-radius: 40px;
+            background: rgba(212,175,55,0.08);
+            border: 1px solid rgba(212,175,55,0.2);
+            align-self: flex-start;
+        }
+        .stats-pill-row .pill-icon { color: var(--primary-gold); flex-shrink: 0; }
+        .stats-pill-row .pill-text { font-weight: 800; font-size: 0.85rem; color: var(--primary-gold); white-space: nowrap; }
 
-        .no-pending { padding: 5rem; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 1rem; }
-        .no-pending h3 { font-size: 1.5rem; }
+        /* 1 column on mobile */
+        .reviews-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+        .review-mod-card { padding: 1.5rem; display: flex; flex-direction: column; }
+        
+        .rm-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; }
+        .rm-product h3 { font-size: 1rem; margin-top: 4px; }
+        .stars { display: flex; gap: 2px; flex-shrink: 0; }
+        
+        .comment { font-style: italic; font-size: 1rem; color: var(--text-primary); margin-bottom: 1rem; border-left: 3px solid var(--primary-glow); padding-left: 1rem; line-height: 1.6; }
+        .author-info { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; border-top: 1px solid var(--border-glass); padding-top: 1rem; }
+        
+        /* Large tap targets for mobile approve/reject */
+        .rm-actions { display: flex; gap: 1rem; margin-top: 1rem; }
+        .flex-1 { flex: 1; justify-content: center; padding: 12px; }
+
+        .no-pending { padding: 3rem 1.5rem; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+        .no-pending h3 { font-size: 1.4rem; }
         .no-pending p { color: var(--text-secondary); }
 
-        @media (max-width: 576px) {
-          .reviews-grid { grid-template-columns: 1fr; }
+        /* Tablet+ */
+        @media (min-width: 640px) {
+          .reviews-grid { grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
+          .review-mod-card { padding: 2rem; }
+        }
+        @media (min-width: 1024px) {
+          .reviews-grid { grid-template-columns: repeat(3, 1fr); gap: 2rem; }
+          .review-mod-card { padding: 2.5rem; }
+          .admin-header { flex-direction: row; justify-content: space-between; align-items: flex-end; }
         }
       `}</style>
     </div>

@@ -37,6 +37,10 @@ const setupDatabase = async () => {
 
         console.log("👉 Building schemas...");
 
+        // 0. Ensure extensions exist
+        await client.query(`CREATE EXTENSION IF NOT EXISTS "pgcrypto";`);
+        console.log(" - pgcrypto extension OK");
+
         // 1. Products
         await client.query(`
             CREATE TABLE IF NOT EXISTS public.products (
@@ -48,12 +52,24 @@ const setupDatabase = async () => {
                 description TEXT,
                 weight TEXT DEFAULT '250g',
                 is_veg BOOLEAN DEFAULT true,
+                is_available BOOLEAN DEFAULT true,
                 tags TEXT[] DEFAULT '{}',
                 created_at TIMESTAMPTZ DEFAULT now(),
                 updated_at TIMESTAMPTZ DEFAULT now()
             );
         `);
         console.log(" - products table OK");
+        
+        // 1b. Ensure is_available column exists for existing products table
+        await client.query(`
+            DO $$ 
+            BEGIN 
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='products' AND column_name='is_available') THEN
+                    ALTER TABLE public.products ADD COLUMN is_available BOOLEAN DEFAULT true;
+                END IF;
+                UPDATE public.products SET is_available = true WHERE is_available IS NULL;
+            END $$;
+        `);
 
         // 2. Stock
         await client.query(`
@@ -68,12 +84,17 @@ const setupDatabase = async () => {
         // 3. Orders
         await client.query(`
             CREATE TABLE IF NOT EXISTS public.orders (
-                id TEXT PRIMARY KEY,
+                id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
                 user_id UUID,
                 customer_name TEXT,
                 customer_email TEXT,
                 customer_phone TEXT,
                 address TEXT,
+                items JSONB,
+                subtotal DECIMAL,
+                delivery_charge DECIMAL,
+                delivery_slot TEXT,
+                delivery_type TEXT,
                 total_price DECIMAL,
                 status TEXT DEFAULT 'pending',
                 payment_status TEXT DEFAULT 'unpaid',
@@ -83,7 +104,30 @@ const setupDatabase = async () => {
                 updated_at TIMESTAMPTZ DEFAULT now()
             );
         `);
-        console.log(" - orders table OK");
+        // 3b. Ensure missing columns exist in existing orders table
+        await client.query(`
+            DO $$ 
+            BEGIN 
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='orders' AND column_name='items') THEN
+                    ALTER TABLE public.orders ADD COLUMN items JSONB;
+                END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='orders' AND column_name='subtotal') THEN
+                    ALTER TABLE public.orders ADD COLUMN subtotal DECIMAL;
+                END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='orders' AND column_name='delivery_charge') THEN
+                    ALTER TABLE public.orders ADD COLUMN delivery_charge DECIMAL;
+                END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='orders' AND column_name='delivery_slot') THEN
+                    ALTER TABLE public.orders ADD COLUMN delivery_slot TEXT;
+                END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='orders' AND column_name='delivery_type') THEN
+                    ALTER TABLE public.orders ADD COLUMN delivery_type TEXT;
+                END IF;
+                
+                -- Ensure id column has the default value generator
+                ALTER TABLE public.orders ALTER COLUMN id SET DEFAULT gen_random_uuid()::text;
+            END $$;
+        `);
 
         // 4. Order Items
         await client.query(`
@@ -117,16 +161,17 @@ const setupDatabase = async () => {
         await client.query(`
             CREATE TABLE IF NOT EXISTS public.delivery_settings (
                 id INTEGER PRIMARY KEY DEFAULT 1,
-                min_order_amount DECIMAL DEFAULT 500,
+                min_order_amount DECIMAL DEFAULT 0,
                 delivery_charge DECIMAL DEFAULT 50,
                 free_above DECIMAL DEFAULT 1500
             );
         `);
         await client.query(`
             INSERT INTO public.delivery_settings (id, min_order_amount, delivery_charge, free_above)
-            VALUES (1, 500, 50, 1500) ON CONFLICT (id) DO NOTHING;
+            VALUES (1, 0, 50, 1500) ON CONFLICT (id) DO UPDATE 
+            SET min_order_amount = 0;
         `);
-        console.log(" - delivery settings OK");
+        console.log(" - delivery settings OK (Min Order: ₹0)");
 
 
         console.log("\n🎊 Database Bootstrapped Successfully! 🎊");

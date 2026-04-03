@@ -10,6 +10,13 @@ const FloatingActions = () => {
   const whatsappMessage = encodeURIComponent("Namaste Venki's Foods! I'd like to know more about your artisanal pickles.");
   const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`;
 
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowTooltip(false);
+    }, 5000);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <div className="floating-actions-wrapper" style={{ position: 'fixed', bottom: '2rem', right: '2rem', zIndex: 1000 }}>
 
@@ -175,11 +182,24 @@ const FloatingActions = () => {
       </AnimatePresence>
 
       <style>{`
+        /* Mobile: add safe-area clearance for browser chrome & OS gesture bar */
         @media (max-width: 768px) {
-          .floating-actions-wrapper { bottom: 1rem !important; right: 1rem !important; }
-          .action-btn { width: 2.8rem !important; height: 2.8rem !important; }
-          .mini-chat-modal { width: calc(100vw - 2.5rem) !important; right: 0 !important; bottom: 4rem !important; }
-          .support-tooltip { display: none; }
+          .floating-actions-wrapper {
+            bottom: calc(env(safe-area-inset-bottom, 0px) + 20px) !important;
+            right: 0.75rem !important;
+          }
+          .action-btn {
+            width: 2.75rem !important;
+            height: 2.75rem !important;
+          }
+          .mini-chat-modal {
+            width: calc(100vw - 1.5rem) !important;
+            right: 0 !important;
+            bottom: 4.5rem !important;
+            height: 360px !important;
+            max-height: 60vh !important;
+          }
+          .support-tooltip { display: none !important; }
         }
       `}</style>
     </div>

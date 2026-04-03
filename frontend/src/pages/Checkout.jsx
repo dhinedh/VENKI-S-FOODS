@@ -30,30 +30,27 @@ const Checkout = () => {
     delivery_slot: '11am-1pm'
   });
 
-  const [couponCode, setCouponCode] = useState('');
-  const [discount, setDiscount] = useState(0);
-  const [couponLoading, setCouponLoading] = useState(false);
-  const [couponError, setCouponError] = useState('');
-  
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [user, setUser] = useState(null);
 
   // Delivery Settings (Hardcoded as per spec or fetched from API)
   const deliveryCharge = (subtotal >= 300 || formData.delivery_type === 'pickup') ? 0 : 40;
-  const totalPrice = subtotal + deliveryCharge - discount;
+  const totalPrice = subtotal + deliveryCharge;
 
   useEffect(() => {
     const fetchUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
-      if (user) {
-        setFormData(prev => ({ 
-          ...prev, 
-          customer_name: user.user_metadata?.full_name || '',
-          customer_phone: user.phone || '' 
-        }));
+      if (!user) {
+        navigate('/login');
+        return;
       }
+      setUser(user);
+      setFormData(prev => ({ 
+        ...prev, 
+        customer_name: user.user_metadata?.full_name || '',
+        customer_phone: user.phone || '' 
+      }));
     };
     fetchUser();
     
@@ -64,24 +61,6 @@ const Checkout = () => {
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleApplyCoupon = async () => {
-    if (!couponCode) return;
-    setCouponLoading(true);
-    setCouponError('');
-    try {
-      const { data } = await api.post('/orders/validate-coupon', { 
-        code: couponCode, 
-        subtotal: subtotal 
-      });
-      setDiscount(data.discount);
-    } catch (err) {
-      setCouponError(err.response?.data?.error || "Invalid coupon");
-      setDiscount(0);
-    } finally {
-      setCouponLoading(false);
-    }
   };
 
   const handleSubmitOrder = async (e) => {
@@ -97,7 +76,6 @@ const Checkout = () => {
       const orderData = {
         user_id: user?.id,
         items: cartItems,
-        coupon_code: discount > 0 ? couponCode : null,
         ...formData
       };
 
@@ -219,20 +197,6 @@ const Checkout = () => {
 
             <div className="divider my-6"></div>
 
-            <div className="coupon-section">
-              <div className="coupon-input">
-                <input 
-                  type="text" placeholder="Promo Code" 
-                  value={couponCode} onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                />
-                <button onClick={handleApplyCoupon} disabled={couponLoading}>
-                  {couponLoading ? "..." : "Apply"}
-                </button>
-              </div>
-              {couponError && <p className="coupon-err">{couponError}</p>}
-              {discount > 0 && <p className="coupon-success">Discount Applied! -₹{discount}</p>}
-            </div>
-
             <div className="calc-row mt-6">
               <span>Subtotal</span>
               <span>₹{subtotal}</span>
@@ -243,20 +207,14 @@ const Checkout = () => {
                 {deliveryCharge === 0 ? 'FREE' : `₹${deliveryCharge}`}
               </span>
             </div>
-            {discount > 0 && (
-              <div className="calc-row discount">
-                <span>Discount</span>
-                <span>-₹{discount}</span>
-              </div>
-            )}
-            
             <div className="calc-row total mt-4">
               <span>Total Amount</span>
               <span>₹{totalPrice}</span>
             </div>
 
             <p className="payment-note mt-6">
-              Currently accepting <strong>Cash on Delivery</strong> only.
+              Currently accepting <strong>Online Payment (UPI / Bank Transfer)</strong>. 
+              <br/>Place your order first, then pay using the details on the next screen.
             </p>
             <div style={{
               marginTop: '1rem', padding: '0.9rem 1rem',
@@ -316,12 +274,6 @@ const Checkout = () => {
         .calc-row.total { font-size: 1.5rem; font-weight: 800; color: var(--text-primary); border-top: 1px solid var(--border-glass); padding-top: 20px; font-family: var(--font-serif); }
         .calc-row .free { color: var(--success); font-weight: 700; }
         
-        .coupon-input { display: flex; background: rgba(0,0,0,0.03); border: 1px solid var(--border-glass); border-radius: var(--radius-md); overflow: hidden; margin-bottom: 10px; }
-        .coupon-input input { flex: 1; border: none; padding: 12px 15px; background: none; color: var(--text-primary); font-family: inherit; font-weight: 600; }
-        .coupon-input button { padding: 0 25px; background: var(--primary-gold); color: #000; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
-        .coupon-err { color: var(--error); font-size: 0.85rem; margin-top: 5px; font-weight: 600; }
-        .coupon-success { color: var(--success); font-size: 0.85rem; margin-top: 5px; font-weight: 700; }
-
         .btn-full { width: 100%; justify-content: center; }
         .form-error { margin-top: 2rem; background: rgba(255, 82, 82, 0.1); border: 1px solid var(--error); color: var(--error); padding: 1rem; border-radius: var(--radius-md); display: flex; items-center; gap: 10px; }
         

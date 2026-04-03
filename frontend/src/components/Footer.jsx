@@ -43,7 +43,7 @@ const Footer = () => {
         <div className="footer-section contact">
           <h3>Contact Us</h3>
           <ul>
-            <li><MapPin size={18} /> <span>Heritage Heights, Tirunelveli (Nellai), TN</span></li>
+            <li><MapPin size={18} /> <span>Chennai, Tamil Nadu</span></li>
             <li><Phone size={18} /> <a href="https://wa.me/917200883609" target="_blank" rel="noopener noreferrer" style={{color:'inherit'}}><span>+91 72008 83609 (WhatsApp)</span></a></li>
             <li><Clock size={18} /> <span>Mon - Sat: 10:00 AM - 7:00 PM</span></li>
             <li><Clock size={18} /> <span style={{color:'var(--primary-gold)', fontWeight:600}}>Dispatch: 5 Working Days</span></li>
