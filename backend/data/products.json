@@ -12,7 +12,7 @@
     "weight": "100gm",
     "price": 75,
     "description": "Authentic Andhra-style lentil podi. Perfect with hot rice and ghee. Keep refrigerated.",
-    "image": "/products/andhra-parupu-podi.jpg",
+    "image": "/products/paupu podi.png",
     "is_available": true
   },
   {
@@ -45,7 +45,7 @@
     "weight": "100gm",
     "price": 100,
     "description": "Nellai-style sesame idli podi with a rich, nutty flavour. A bestseller. Keep refrigerated.",
-    "image": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&q=80&w=600",
+    "image": "/products/nellai elu.png",
     "is_available": true
   },
   {
