@@ -9,7 +9,6 @@ import {
 import { supabase } from '../lib/supabase';
 import api from '../lib/api';
 import SEOHead from '../components/SEOHead';
-
 const Account = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('orders'); // 'profile', 'orders', 'settings'
@@ -311,7 +310,6 @@ const Account = () => {
           </AnimatePresence>
         </main>
       </div>
-
       <style>{`
         .account-page { min-height: 80vh; }
         .account-layout { display: grid; grid-template-columns: 320px 1fr; gap: 4rem; align-items: start; }

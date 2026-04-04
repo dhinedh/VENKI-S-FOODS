@@ -87,11 +87,6 @@ const ProductDetail = () => {
 
 
   const handleAddToCart = async () => {
-    const { data: { user: authCheck } } = await supabase.auth.getUser();
-    if (!authCheck) {
-      navigate('/login');
-      return;
-    }
     addItem({ ...product }, qty);
   };
 
