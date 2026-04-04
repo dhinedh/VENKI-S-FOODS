@@ -16,7 +16,7 @@ const Login = () => {
   const [error, setError] = useState('');
   
   // User Form State
-  const [userForm, setUserForm] = useState({ full_name: '', phone: '' });
+  const [userForm, setUserForm] = useState({ full_name: '', phone: '+91 ' });
   
   // Admin Form State
   const [adminForm, setAdminForm] = useState({ email: '', password: '' });
@@ -154,9 +154,16 @@ const Login = () => {
                 <input 
                   type="tel" required 
                   value={userForm.phone} 
-                  onChange={(e) => setUserForm({...userForm, phone: e.target.value.replace(/\D/g, '')})}
-                  placeholder="10-digit number"
-                  maxLength={10}
+                  onChange={(e) => {
+                    let val = e.target.value;
+                    if (!val.startsWith('+91 ')) {
+                      // If they try to delete the prefix, just reset it to prefix plus any digits they might have typed
+                      val = '+91 ' + val.replace(/\D/g, '').replace(/^91/, '');
+                    }
+                    setUserForm({...userForm, phone: val});
+                  }}
+                  placeholder="+91 9876543210"
+                  maxLength={14}
                 />
               </div>
             </div>

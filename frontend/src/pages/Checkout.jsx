@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ShoppingBag, Truck, Store, Clock, Ticket, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
+import { ShoppingBag, Truck, Store, Clock, Ticket, ArrowRight, Loader2, AlertCircle, X } from 'lucide-react';
 import useCartStore from '../store/cartStore';
 import api from '../lib/api';
 import { supabase } from '../lib/supabase';
@@ -24,18 +24,21 @@ const Checkout = () => {
 
   const [formData, setFormData] = useState({
     customer_name: '',
-    customer_phone: '',
+    customer_phone: '+91',
     delivery_type: 'delivery',
     address: '',
-    delivery_slot: '11am-1pm'
+    pincode: ''
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [user, setUser] = useState(null);
+  
+  const [showUpiModal, setShowUpiModal] = useState(false);
+  const [completedOrder, setCompletedOrder] = useState(null);
 
   // Delivery Settings (Hardcoded as per spec or fetched from API)
-  const deliveryCharge = (subtotal >= 300 || formData.delivery_type === 'pickup') ? 0 : 40;
+  const deliveryCharge = (subtotal >= 1000 || formData.delivery_type === 'pickup') ? 0 : 40;
   const totalPrice = subtotal + deliveryCharge;
 
   useEffect(() => {
@@ -70,7 +73,7 @@ const Checkout = () => {
       setFormData(prev => ({ 
         ...prev, 
         customer_name: currentUser.user_metadata?.full_name || '',
-        customer_phone: currentUser.phone || '' 
+        customer_phone: currentUser.phone ? (currentUser.phone.startsWith('+91') ? currentUser.phone : '+91' + currentUser.phone) : '+91' 
       }));
     };
     fetchUser();
@@ -95,16 +98,20 @@ const Checkout = () => {
       }
 
       const orderData = {
-        user_id: user?.id,
+        user_id: user?.id === user?.phone ? null : user?.id,
         items: cartItems,
-        ...formData
+        ...formData,
+        address: formData.delivery_type === 'delivery' 
+          ? `${formData.address}\nPincode: ${formData.pincode}` 
+          : ''
       };
 
       const { data } = await api.post('/orders', orderData);
       
       if (data.success) {
         clearCart();
-        navigate(`/track/${data.order_id}`);
+        setCompletedOrder({ id: data.order_id, total: totalPrice });
+        setShowUpiModal(true);
       }
     } catch (err) {
       setError(err.response?.data?.error || err.message);
@@ -138,7 +145,7 @@ const Checkout = () => {
                 <input 
                   type="tel" name="customer_phone" required 
                   value={formData.customer_phone} onChange={handleInputChange}
-                  placeholder="e.g. 9876543210"
+                  placeholder="+91 9876543210"
                 />
               </div>
             </div>
@@ -164,32 +171,27 @@ const Checkout = () => {
             </div>
 
             {formData.delivery_type === 'delivery' && (
-              <div className="form-group mt-6 animate-fade">
-                <label>Delivery Address</label>
-                <textarea 
-                  name="address" rows="3" required
-                  value={formData.address} onChange={handleInputChange}
-                  placeholder="Full flat/house no., Building, Area/Street..."
-                ></textarea>
-              </div>
+              <>
+                <div className="form-group mt-6 animate-fade">
+                  <label>Delivery Address</label>
+                  <textarea 
+                    name="address" rows="3" required
+                    value={formData.address} onChange={handleInputChange}
+                    placeholder="Full flat/house no., Building, Area/Street..."
+                  ></textarea>
+                </div>
+                <div className="form-group animate-fade mt-4">
+                  <label>Pincode</label>
+                  <input 
+                    type="text" name="pincode" required 
+                    value={formData.pincode} onChange={handleInputChange}
+                    placeholder="e.g. 600001"
+                    maxLength={6}
+                  />
+                </div>
+              </>
             )}
 
-            <div className="form-group mt-6">
-              <label>Select Time Slot</label>
-              <div className="slot-grid">
-                {['11am-1pm', '2pm-5pm', '6pm-9pm'].map(slot => (
-                  <label key={slot} className={`slot-card ${formData.delivery_slot === slot ? 'active' : ''}`}>
-                    <input 
-                      type="radio" name="delivery_slot" value={slot} 
-                      checked={formData.delivery_slot === slot} 
-                      onChange={handleInputChange}
-                    />
-                    <Clock size={18} />
-                    <span>{slot}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
 
             {error && (
               <div className="form-error">
@@ -260,6 +262,42 @@ const Checkout = () => {
 
       </div>
 
+      {showUpiModal && completedOrder && (
+        <div className="upi-modal-overlay">
+          <div className="upi-modal-card glass-card relative">
+            <button 
+              className="absolute top-4 right-4 text-secondary hover:text-white"
+              onClick={() => navigate(`/track/${completedOrder.id}`)}
+            >
+              <X size={24} />
+            </button>
+            <h3 className="font-serif text-3xl gold-text mb-4" style={{marginTop: 0}}>Confirm via UPI</h3>
+            <p className="text-secondary mb-6 p-text">
+              Almost done! Pay <strong>₹{completedOrder.total}</strong> via UPI to:
+            </p>
+            <div className="upi-number">72008 83609</div>
+            <p className="text-secondary modal-small-text">
+              After payment, tap the button below to share your screenshot safely on WhatsApp to confirm your order.
+            </p>
+            <div className="modal-actions">
+              <a 
+                href={`https://wa.me/917200883609?text=Hi! I have just placed order %23${completedOrder.id.substring(0,8)}.%0A%0AHere is my payment screenshot for ₹${completedOrder.total}.`}
+                target="_blank" rel="noopener noreferrer"
+                className="btn btn-primary btn-full justify-center mb-4 text-center items-center flex"
+              >
+                Share Screenshot <ArrowRight size={18} className="ml-2"/>
+              </a>
+              <button 
+                onClick={() => navigate(`/track/${completedOrder.id}`)}
+                className="btn-text skip-btn"
+              >
+                Done (Track Order)
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <style>{`
         .checkout-layout { display: grid; grid-template-columns: 1fr 380px; gap: 3rem; }
         .checkout-main { padding: 2.5rem; }
@@ -312,6 +350,34 @@ const Checkout = () => {
           .slot-grid { grid-template-columns: 1fr; }
           .type-toggle { grid-template-columns: 1fr; }
         }
+
+        .upi-modal-overlay {
+          position: fixed; inset: 0; z-index: 9999;
+          background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
+          display: flex; align-items: center; justify-content: center;
+          padding: 20px; animation: fadeIn 0.3s ease;
+        }
+        .upi-modal-card {
+          position: relative;
+          max-width: 420px; width: 100%; padding: 2.5rem; text-align: center;
+          box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+          border: 1px solid rgba(212, 175, 55, 0.3);
+        }
+        .absolute { position: absolute; }
+        .top-4 { top: 1rem; }
+        .right-4 { right: 1rem; }
+        .p-text { font-size: 1.1rem; line-height: 1.5; }
+        .p-text strong { color: var(--text-primary); font-size: 1.25rem; }
+        .upi-number {
+          background: rgba(212, 175, 55, 0.1);
+          border: 1px dashed var(--primary-gold);
+          padding: 1rem; border-radius: var(--radius-md);
+          font-size: 1.8rem; font-weight: 800; letter-spacing: 2px;
+          margin: 1.5rem 0; color: var(--text-primary);
+        }
+        .modal-small-text { font-size: 0.85rem; margin-bottom: 2rem; }
+        .skip-btn { width: 100%; color: var(--text-secondary); transition: 0.3s; background: none; border: none; font-weight: 600; cursor: pointer; }
+        .skip-btn:hover { color: var(--text-primary); text-decoration: underline; }
       `}</style>
     </div>
   );
