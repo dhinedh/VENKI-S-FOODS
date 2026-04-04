@@ -68,14 +68,16 @@ const Login = () => {
 
     const ADMIN_EMAIL = "admin.venkis@gmail.com";
     const ADMIN_PASS = "AdminHeritage2024!";
-    const isAdminCredentials = adminForm.email.toLowerCase() === ADMIN_EMAIL.toLowerCase() && 
+    const setAttemptEmail = adminForm.email.toLowerCase() === 'admin' ? ADMIN_EMAIL : adminForm.email;
+
+    const isAdminCredentials = setAttemptEmail.toLowerCase() === ADMIN_EMAIL.toLowerCase() && 
                                adminForm.password === ADMIN_PASS;
 
     try {
       setTimeout(preloadNextPage, 100);
 
       const { data, error: signInError } = await supabase.auth.signInWithPassword({
-        email: adminForm.email,
+        email: setAttemptEmail,
         password: adminForm.password,
       });
 
@@ -124,11 +126,26 @@ const Login = () => {
               <h2 className="font-serif text-2xl font-bold">Venki's <span className="gold-text">Foods</span></h2>
             </Link>
            <h1>{isAdminMode ? 'Admin Access' : 'Welcome'}</h1>
-           <p>
+          <p>
              {isAdminMode 
                ? 'Secure administrative portal.'
                : 'Enter your details to order your favourite heritage pickles.'}
            </p>
+        </div>
+
+        <div className="flex mb-8 border-b border-[rgba(212,175,55,0.2)]">
+           <button 
+             className={`flex-1 pb-3 text-center transition-colors font-bold text-sm uppercase tracking-wider ${!isAdminMode ? 'text-primary border-b-2 border-[#d4af37]' : 'text-secondary hover:text-white'}`}
+             onClick={() => { setIsAdminMode(false); setError(''); }}
+           >
+              Customer Order
+           </button>
+           <button 
+             className={`flex-1 pb-3 text-center transition-colors font-bold text-sm uppercase tracking-wider ${isAdminMode ? 'text-primary border-b-2 border-[#d4af37]' : 'text-secondary hover:text-white'}`}
+             onClick={() => { setIsAdminMode(true); setError(''); }}
+           >
+              Admin Panel
+           </button>
         </div>
 
         {!isAdminMode ? (
@@ -189,14 +206,14 @@ const Login = () => {
           /* ================= ADMIN FORM ================= */
           <form onSubmit={handleAdminLogin} className="auth-form">
             <div className="form-group">
-              <label>Admin Email</label>
+              <label>Admin User ID / Email</label>
               <div className="input-with-icon">
-                <Mail size={18} />
+                <User size={18} />
                 <input 
-                  type="email" required 
+                  type="text" required 
                   value={adminForm.email} 
                   onChange={(e) => setAdminForm({...adminForm, email: e.target.value})}
-                  placeholder="admin.venkis@gmail.com"
+                  placeholder="e.g. admin"
                 />
               </div>
             </div>
@@ -233,18 +250,6 @@ const Login = () => {
           </form>
         )}
 
-        <div className="auth-footer mt-8 pt-6 border-t border-gold-light/20">
-           <button 
-             onClick={() => {
-               setIsAdminMode(!isAdminMode);
-               setError('');
-             }} 
-             className="flex items-center justify-center mx-auto text-sm text-secondary hover:text-primary transition-colors"
-           >
-             <Shield size={14} className="mr-2 opacity-60" />
-             {isAdminMode ? "Return to User Login" : "Admin Portal"}
-           </button>
-        </div>
       </div>
 
       <style>{`
