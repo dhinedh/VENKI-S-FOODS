@@ -26,6 +26,7 @@ const createOrder = async (req, res) => {
     // 2. Validate items & calculate subtotal (Inner Ring Security)
     const productsData = JSON.parse(fs.readFileSync(PRODUCTS_DATA_PATH, 'utf8'));
     let subtotal = 0;
+    let totalGrams = 0;
     const validatedItems = [];
 
     for (const item of items) {
@@ -37,6 +38,16 @@ const createOrder = async (req, res) => {
       
       const itemSubtotal = productInfo.price * item.qty;
       subtotal += itemSubtotal;
+      
+      let weightStr = (productInfo.weight || "0").toString().toLowerCase().trim();
+      let grams = 0;
+      if (weightStr.includes('kg')) {
+        grams = parseFloat(weightStr.replace(/[^\d.]/g, '')) * 1000;
+      } else {
+        grams = parseFloat(weightStr.replace(/[^\d.]/g, ''));
+      }
+      totalGrams += (isNaN(grams) ? 0 : grams) * item.qty;
+
       validatedItems.push({ ...productInfo, qty: item.qty, total: itemSubtotal });
 
       // Stock check
@@ -47,8 +58,10 @@ const createOrder = async (req, res) => {
       }
     }
 
-    // 4. Delivery Charge
-    let delivery_charge = (delivery_type === 'delivery' && subtotal < settings.free_above) ? settings.delivery_charge : 0;
+    // 4. Delivery Charge (₹50 per 1 kg or part thereof)
+    let delivery_charge = delivery_type === 'pickup' 
+      ? 0 
+      : Math.max(1, Math.ceil(totalGrams / 1000)) * 50;
 
     const total_price = subtotal + Number(delivery_charge);
 

@@ -117,6 +117,8 @@ const AdminOrders = () => {
                   </a>
                 </div>
 
+                {/* Address is now inside the View Modal to keep UI clean */}
+
                 {/* Order Meta Row */}
                 <div className="order-card-meta">
                   <div className="meta-item">
@@ -134,11 +136,11 @@ const AdminOrders = () => {
                 {/* Total + Action */}
                 <div className="order-card-footer">
                   <span className="order-total">₹{order.total_price}</span>
-                  <button className="btn btn-primary btn-update" onClick={() => {
+                  <button className="btn btn-secondary btn-update" onClick={() => {
                     setSelectedOrder(order);
                     setUpdateForm({ status: order.status, tracking_note: order.tracking_note || '' });
                   }}>
-                    <Edit3 size={16}/> Update
+                    View Details <ChevronRight size={16}/>
                   </button>
                 </div>
               </div>
@@ -149,14 +151,54 @@ const AdminOrders = () => {
         )}
       </main>
 
-      {/* Update Modal */}
+      {/* Update & View Modal */}
       {selectedOrder && (
         <div className="modal-overlay">
           <div className="modal-content glass-card anim-slide-in">
             <div className="modal-header">
-               <h3>Update Order #{selectedOrder.id.substring(0,8)}</h3>
+               <h3>Manage Order #{selectedOrder.id.substring(0,8)}</h3>
                <button onClick={() => setSelectedOrder(null)}><X /></button>
             </div>
+
+            {/* Comprehensive Order Details */}
+            <div className="mb-6 pb-6 border-b border-[rgba(212,175,55,0.2)]">
+               <h4 className="text-sm font-bold text-primary mb-3 uppercase tracking-wider">Order Context</h4>
+               
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                 <div>
+                   <p className="text-xs text-secondary mb-1">Customer</p>
+                   <p className="text-sm font-semibold">{selectedOrder.customer_name}</p>
+                   <p className="text-sm text-gold">{selectedOrder.customer_phone}</p>
+                 </div>
+                 
+                 {selectedOrder.delivery_type === 'delivery' ? (
+                   <div>
+                     <p className="text-xs text-secondary mb-1">Delivery Address</p>
+                     <p className="text-sm leading-snug">{selectedOrder.address}</p>
+                   </div>
+                 ) : (
+                   <div>
+                     <p className="text-xs text-secondary mb-1">Fulfillment</p>
+                     <p className="text-sm font-bold text-blue-400">Store Pickup</p>
+                   </div>
+                 )}
+               </div>
+
+               {selectedOrder.items && (
+                 <div className="bg-black/20 p-3 rounded-lg border border-white/5">
+                   <p className="text-xs text-secondary mb-2 uppercase">Items Ordered</p>
+                   <ul className="text-sm space-y-1">
+                     {selectedOrder.items.map((it, i) => (
+                       <li key={i} className="flex justify-between items-center">
+                         <span><span className="text-gold font-bold">{it.qty}x</span> {it.name}</span>
+                         <span className="text-secondary tracking-wider">₹{it.price * it.qty}</span>
+                       </li>
+                     ))}
+                   </ul>
+                 </div>
+               )}
+            </div>
+
             <form onSubmit={handleUpdateStatus}>
                <div className="form-group mb-6">
                  <label>Set Status</label>
@@ -221,6 +263,9 @@ const AdminOrders = () => {
         .order-card-customer { display: flex; flex-direction: row; justify-content: space-between; align-items: center; }
         .customer-name { font-weight: 700; font-size: 1rem; color: #fff; }
         .customer-phone { display: flex; align-items: center; gap: 6px; color: var(--primary-gold); font-weight: 600; font-size: 0.85rem; text-decoration: none; }
+        
+        .order-card-address { display: flex; align-items: flex-start; gap: 8px; font-size: 0.85rem; color: var(--text-secondary); background: rgba(0,0,0,0.15); padding: 10px 12px; border-radius: var(--radius-sm); border: 1px dashed var(--border-glass); line-height: 1.4; }
+        .order-card-address .addr-icon { margin-top: 3px; flex-shrink: 0; color: var(--primary-gold); }
 
         .order-card-meta { display: flex; flex-wrap: wrap; gap: 1rem; }
         .meta-item { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; color: var(--text-secondary); font-weight: 600; }

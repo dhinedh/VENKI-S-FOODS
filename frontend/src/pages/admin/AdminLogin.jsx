@@ -1,70 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Mail, Lock, User, Phone, ArrowRight, Loader2, AlertCircle, Shield } from 'lucide-react';
-import { supabase } from '../lib/supabase';
-import SEOHead from '../components/SEOHead';
+import { Mail, Lock, LogIn, ArrowRight, Loader2, AlertCircle, Shield } from 'lucide-react';
+import { supabase } from '../../lib/supabase';
+import SEOHead from '../../components/SEOHead';
 
-/**
- * Login.jsx
- * - Simplified flow: Users login directly with Phone and Name (Local Session)
- * - Admin login remains secure behind a toggle (Supabase Auth)
- */
-const Login = () => {
+const AdminLogin = () => {
   const navigate = useNavigate();
-  const [isAdminMode, setIsAdminMode] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-
-  // User Form State
-  const [userForm, setUserForm] = useState({ full_name: '', phone: '+91 ' });
-
-  // Admin Form State
+  const [loadingStatus, setLoadingStatus] = useState('');
+  
   const [adminForm, setAdminForm] = useState({ email: '', password: '' });
 
-  const [loadingStatus, setLoadingStatus] = useState('');
-
   useEffect(() => {
-    const existingSess = localStorage.getItem('user_session');
-    if (existingSess) {
-      navigate('/menu');
-    }
+    const checkSession = async () => {
+      const bypass = localStorage.getItem('user_role');
+      if (bypass === 'admin') {
+        navigate('/admin');
+        return;
+      }
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user?.user_metadata?.role === 'admin') {
+        navigate('/admin');
+      }
+    };
+    checkSession();
   }, [navigate]);
 
-  // Pre-load main chunks for snappier navigation
   const preloadNextPage = () => {
-    import('./Menu').catch(() => { });
-    if (isAdminMode) import('./admin/Dashboard').catch(() => { });
-  };
-
-  const handleUserLogin = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setLoadingStatus('Logging in...');
-
-    // Quick validation
-    if (userForm.phone.length < 10) {
-      setError("Please enter a valid phone number.");
-      setLoading(false);
-      return;
-    }
-
-    // Direct Login using LocalStorage for normal users
-    setTimeout(() => {
-      const userSession = {
-        name: userForm.full_name,
-        phone: userForm.phone,
-        role: 'user',
-        timestamp: new Date().getTime()
-      };
-
-      localStorage.setItem('user_session', JSON.stringify(userSession));
-
-      // Dispatch storage event so NavBar updates immediately
-      window.dispatchEvent(new Event('storage'));
-
-      setLoading(false);
-      navigate('/menu');
-    }, 600); // Small artificial delay for visual feedback
+    import('./Dashboard').catch(() => {});
   };
 
   const handleAdminLogin = async (e) => {
@@ -75,16 +39,14 @@ const Login = () => {
 
     const ADMIN_EMAIL = "admin.venkis@gmail.com";
     const ADMIN_PASS = "AdminHeritage2024!";
-    const setAttemptEmail = adminForm.email.toLowerCase() === 'admin' ? ADMIN_EMAIL : adminForm.email;
-
-    const isAdminCredentials = setAttemptEmail.toLowerCase() === ADMIN_EMAIL.toLowerCase() &&
-      adminForm.password === ADMIN_PASS;
+    const isAdminCredentials = adminForm.email.toLowerCase() === ADMIN_EMAIL.toLowerCase() && 
+                               adminForm.password === ADMIN_PASS;
 
     try {
       setTimeout(preloadNextPage, 100);
 
       const { data, error: signInError } = await supabase.auth.signInWithPassword({
-        email: setAttemptEmail,
+        email: adminForm.email,
         password: adminForm.password,
       });
 
@@ -92,12 +54,12 @@ const Login = () => {
         if (isAdminCredentials) {
           console.warn("🔐 Supabase: Auth failed. Activating Developer Admin Bypass...");
           setLoadingStatus('Sychronizing admin data...');
-
+          
           localStorage.setItem('admin_bypass_token', import.meta.env.VITE_ADMIN_SECRET || 'sb_sec');
           localStorage.setItem('user_role', 'admin');
-
+          
           await new Promise(r => setTimeout(r, 500));
-
+          
           window.dispatchEvent(new Event('storage'));
           navigate('/admin');
           return;
@@ -106,10 +68,10 @@ const Login = () => {
       }
 
       setLoadingStatus('Redirecting to dashboard...');
-
+      
       const role = data?.user?.user_metadata?.role;
       window.dispatchEvent(new Event('storage'));
-
+      
       if (role === 'admin') {
         navigate('/admin');
       } else {
@@ -125,52 +87,40 @@ const Login = () => {
 
   return (
     <div className="login-page container section-padding">
-      <SEOHead title={isAdminMode ? "Admin Login" : "Login"} />
-
+      <SEOHead title="Admin Login | System Access" />
+      
       <div className="auth-wrapper glass-card anim-slide-in">
         <div className="auth-header">
-          <Link to="/" className="auth-logo">
-            <h2 className="font-serif text-2xl font-bold">Venki's <span className="gold-text">Foods</span></h2>
-          </Link>
-          <h1>{isAdminMode ? 'Admin Access' : 'Welcome'}</h1>
-          <p>
-            {isAdminMode
-              ? 'Secure administrative portal.'
-              : 'Enter your details to order your favourite heritage pickles.'}
-          </p>
+            <Link to="/" className="auth-logo">
+              <h2 className="font-serif text-2xl font-bold">Venki's <span className="gold-text">Foods</span></h2>
+            </Link>
+           <h1>Admin Access</h1>
+           <p>Secure administrative portal.</p>
         </div>
 
-        <form onSubmit={handleUserLogin} className="auth-form">
+        <form onSubmit={handleAdminLogin} className="auth-form">
           <div className="form-group">
-            <label>Full Name</label>
+            <label>Admin Email</label>
             <div className="input-with-icon">
-              <User size={18} />
-              <input
-                type="text" required
-                value={userForm.full_name}
-                onChange={(e) => setUserForm({ ...userForm, full_name: e.target.value })}
-                placeholder="e.g. Rahul Sharma"
+              <Mail size={18} />
+              <input 
+                type="email" required 
+                value={adminForm.email} 
+                onChange={(e) => setAdminForm({...adminForm, email: e.target.value})}
+                placeholder="admin.venkis@gmail.com"
               />
             </div>
           </div>
 
           <div className="form-group">
-            <label>Mobile Number</label>
+            <label>Password</label>
             <div className="input-with-icon">
-              <Phone size={18} />
-              <input
-                type="tel" required
-                value={userForm.phone}
-                onChange={(e) => {
-                  let val = e.target.value;
-                  if (!val.startsWith('+91 ')) {
-                    // If they try to delete the prefix, just reset it to prefix plus any digits they might have typed
-                    val = '+91 ' + val.replace(/\D/g, '').replace(/^91/, '');
-                  }
-                  setUserForm({ ...userForm, phone: val });
-                }}
-                placeholder="+91 9876543210"
-                maxLength={14}
+              <Lock size={18} />
+              <input 
+                type="password" required 
+                value={adminForm.password} 
+                onChange={(e) => setAdminForm({...adminForm, password: e.target.value})}
+                placeholder="••••••••"
               />
             </div>
           </div>
@@ -188,21 +138,20 @@ const Login = () => {
                 <span className="text-sm font-bold tracking-widest">{loadingStatus.toUpperCase()}</span>
               </div>
             ) : (
-              <>Continue <ArrowRight size={20} /></>
+              <>Secure Login <Lock size={18} className="ml-2"/></>
             )}
           </button>
         </form>
 
         <div className="auth-footer mt-8 pt-6 border-t border-gold-light/20">
            <Link 
-             to="/admin-login"
+             to="/login"
              className="flex items-center justify-center mx-auto text-sm text-secondary hover:text-primary transition-colors"
            >
-             <Shield size={14} className="mr-2 opacity-60" />
-             Admin Portal
+             <LogIn size={14} className="mr-2 opacity-60" />
+             Return to Customer Login
            </Link>
         </div>
-
       </div>
 
       <style>{`
@@ -213,8 +162,7 @@ const Login = () => {
           text-align: center;
         }
         .auth-header { margin-bottom: 2.5rem; }
-        .auth-logo h2 { margin-bottom: 1rem; }
-        .auth-logo h2 { color: var(--text-primary); }
+        .auth-logo h2 { margin-bottom: 1rem; color: var(--text-primary); }
 
         .auth-header h1 { font-size: 2.5rem; margin-bottom: 0.5rem; color: var(--text-primary); font-family: var(--font-serif); }
         .auth-header p { color: var(--text-secondary); font-size: 1rem; }
@@ -258,4 +206,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default AdminLogin;

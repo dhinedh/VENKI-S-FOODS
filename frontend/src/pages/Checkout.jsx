@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ShoppingBag, Truck, Store, Clock, Ticket, ArrowRight, Loader2, AlertCircle, X } from 'lucide-react';
+import { ShoppingBag, Truck, Store, Clock, Ticket, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
 import useCartStore from '../store/cartStore';
 import api from '../lib/api';
 import { supabase } from '../lib/supabase';
@@ -37,8 +37,22 @@ const Checkout = () => {
   const [showUpiModal, setShowUpiModal] = useState(false);
   const [completedOrder, setCompletedOrder] = useState(null);
 
-  // Delivery Settings (Hardcoded as per spec or fetched from API)
-  const deliveryCharge = (subtotal >= 1000 || formData.delivery_type === 'pickup') ? 0 : 40;
+  // Calculate weight-based delivery charge (₹50 per started kg)
+  const totalGrams = cartItems.reduce((acc, item) => {
+    let weightStr = (item.weight || "0").toString().toLowerCase().trim();
+    let grams = 0;
+    if (weightStr.includes('kg')) {
+      grams = parseFloat(weightStr.replace(/[^\d.]/g, '')) * 1000;
+    } else {
+      grams = parseFloat(weightStr.replace(/[^\d.]/g, ''));
+    }
+    return acc + ((isNaN(grams) ? 0 : grams) * item.qty);
+  }, 0);
+
+  const deliveryCharge = formData.delivery_type === 'pickup' 
+    ? 0 
+    : Math.max(1, Math.ceil(totalGrams / 1000)) * 50;
+
   const totalPrice = subtotal + deliveryCharge;
 
   useEffect(() => {
@@ -264,13 +278,7 @@ const Checkout = () => {
 
       {showUpiModal && completedOrder && (
         <div className="upi-modal-overlay">
-          <div className="upi-modal-card glass-card relative">
-            <button 
-              className="absolute top-4 right-4 text-secondary hover:text-white"
-              onClick={() => navigate(`/track/${completedOrder.id}`)}
-            >
-              <X size={24} />
-            </button>
+          <div className="upi-modal-card glass-card">
             <h3 className="font-serif text-3xl gold-text mb-4" style={{marginTop: 0}}>Confirm via UPI</h3>
             <p className="text-secondary mb-6 p-text">
               Almost done! Pay <strong>₹{completedOrder.total}</strong> via UPI to:
@@ -291,7 +299,7 @@ const Checkout = () => {
                 onClick={() => navigate(`/track/${completedOrder.id}`)}
                 className="btn-text skip-btn"
               >
-                Done (Track Order)
+                Close & Track Order
               </button>
             </div>
           </div>
@@ -358,14 +366,10 @@ const Checkout = () => {
           padding: 20px; animation: fadeIn 0.3s ease;
         }
         .upi-modal-card {
-          position: relative;
           max-width: 420px; width: 100%; padding: 2.5rem; text-align: center;
           box-shadow: 0 25px 50px rgba(0,0,0,0.5);
           border: 1px solid rgba(212, 175, 55, 0.3);
         }
-        .absolute { position: absolute; }
-        .top-4 { top: 1rem; }
-        .right-4 { right: 1rem; }
         .p-text { font-size: 1.1rem; line-height: 1.5; }
         .p-text strong { color: var(--text-primary); font-size: 1.25rem; }
         .upi-number {

@@ -24,6 +24,7 @@ const Account = lazy(() => import('./pages/Account'));
 const AuthCallback = lazy(() => import('./pages/AuthCallback'));
 
 // Admin Pages
+const AdminLogin = lazy(() => import('./pages/admin/AdminLogin'));
 const Dashboard = lazy(() => import('./pages/admin/Dashboard'));
 const AdminOrders = lazy(() => import('./pages/admin/Orders'));
 const AdminStock = lazy(() => import('./pages/admin/Stock'));
@@ -63,6 +64,7 @@ const AnimatedRoutes = () => {
         <Route path="/track" element={<PageWrapper><OrderTrack /></PageWrapper>} />
 
         <Route path="/login" element={<PageWrapper><Login /></PageWrapper>} />
+        <Route path="/admin-login" element={<PageWrapper><AdminLogin /></PageWrapper>} />
 
         {/* User Protected Routes */}
         <Route path="/orders" element={
