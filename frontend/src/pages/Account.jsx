@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   User, Package, Settings, LogOut, ChevronRight, 
   Clock, CheckCircle, Truck, XCircle, ShoppingBag, 
-  Mail, Calendar, MapPin, Heart
+  Mail, Calendar, MapPin, Heart, Phone
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import api from '../lib/api';
@@ -25,13 +25,36 @@ const Account = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       setLoading(true);
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
+      
+      const localSess = localStorage.getItem('user_session') ? JSON.parse(localStorage.getItem('user_session')) : null;
+      let currentUser = null;
+
+      if (localSess) {
+        currentUser = {
+          id: localSess.phone,
+          email: localSess.phone,
+          user_metadata: { full_name: localSess.name },
+          created_at: new Date(localSess.timestamp || new Date()).toISOString()
+        };
+      } else {
+        const { data: { user: supabaseUser } } = await supabase.auth.getUser();
+        if (supabaseUser) {
+           currentUser = supabaseUser;
+        } else {
+           const bypassRole = localStorage.getItem('user_role');
+           if (bypassRole === 'admin') {
+              currentUser = { id: 'admin', email: 'admin.venkis@gmail.com', user_metadata: { full_name: 'Admin' } };
+           }
+        }
+      }
+
+      if (!currentUser) {
         navigate('/login');
         return;
       }
-      setUser(user);
-      setEditName(user.user_metadata?.full_name || '');
+
+      setUser(currentUser);
+      setEditName(currentUser.user_metadata?.full_name || '');
       setLoading(false);
       
       // Fetch initial orders
@@ -58,13 +81,20 @@ const Account = () => {
     setUpdateMsg({ type: '', text: '' });
     
     try {
-      const { data, error } = await supabase.auth.updateUser({
-        data: { full_name: editName }
-      });
-
-      if (error) throw error;
+      const localSess = localStorage.getItem('user_session') ? JSON.parse(localStorage.getItem('user_session')) : null;
       
-      setUser(data.user);
+      if (localSess) {
+         // Update local session
+         localSess.name = editName;
+         localStorage.setItem('user_session', JSON.stringify(localSess));
+         setUser({ ...user, user_metadata: { full_name: editName } });
+      } else {
+         const { data, error } = await supabase.auth.updateUser({
+           data: { full_name: editName }
+         });
+         if (error) throw error;
+         setUser(data.user);
+      }
       setIsEditing(false);
       setUpdateMsg({ type: 'success', text: 'Heritage profile updated successfully!' });
       
@@ -76,7 +106,8 @@ const Account = () => {
   };
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    localStorage.removeItem('user_session');
+    try { await supabase.auth.signOut(); } catch(e) {}
     navigate('/');
   };
 
@@ -220,7 +251,7 @@ const Account = () => {
                     )}
                   </div>
                   <div className="info-box glass-card readonly">
-                    <label><Mail size={16}/> Email Address</label>
+                    <label><Phone size={16}/> Registered Identity</label>
                     <p>{user?.email}</p>
                   </div>
                   <div className="info-box glass-card readonly">

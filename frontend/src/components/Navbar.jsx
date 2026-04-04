@@ -20,25 +20,64 @@ const Navbar = () => {
     window.addEventListener('scroll', handleScroll);
     
     const checkUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setSession(session);
-      setIsAdmin(session?.user?.user_metadata?.role === 'admin');
+      // 1. Check Supabase (Admin)
+      const { data: { session: supabaseSession } } = await supabase.auth.getSession();
+      
+      // 2. Check local storage (Standard User)
+      const localSession = localStorage.getItem('user_session') ? JSON.parse(localStorage.getItem('user_session')) : null;
+
+      if (supabaseSession) {
+        setSession(supabaseSession);
+        setIsAdmin(supabaseSession.user?.user_metadata?.role === 'admin');
+      } else if (localSession) {
+        setSession(localSession);
+        setIsAdmin(false);
+      } else {
+        // Also check bypass token just in case
+        const bypassRole = localStorage.getItem('user_role');
+        if (bypassRole === 'admin') {
+           setSession({ user: { email: 'admin' }, role: 'admin' });
+           setIsAdmin(true);
+        } else {
+           setSession(null);
+           setIsAdmin(false);
+        }
+      }
     };
     
     checkUser();
+    
     const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      setIsAdmin(session?.user?.user_metadata?.role === 'admin');
+      // Don't overwrite local session if Supabase is null, let checkUser handle it
+      if (session) {
+        setSession(session);
+        setIsAdmin(session?.user?.user_metadata?.role === 'admin');
+      } else {
+        checkUser(); // Re-check to see if a local user session exists
+      }
     });
+
+    // Listen for storage changes from Login component
+    window.addEventListener('storage', checkUser);
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('storage', checkUser);
       authListener.subscription.unsubscribe();
     };
   }, []);
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    localStorage.removeItem('user_session');
+    
+    try {
+      await supabase.auth.signOut();
+    } catch(e) {
+      console.warn("Supabase signout failed, probably wasn't logged in.", e);
+    }
+    
+    setSession(null);
+    setIsAdmin(false);
     navigate('/');
     setIsMobileMenuOpen(false);
   };

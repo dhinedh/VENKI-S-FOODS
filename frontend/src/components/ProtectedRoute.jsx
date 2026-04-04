@@ -24,15 +24,20 @@ const ProtectedRoute = ({ children, requireAdmin = false }) => {
           setSession(supabaseSession);
           setIsAdmin(supabaseSession.user?.user_metadata?.role === 'admin');
         } 
-        // 2. Otherwise, check for Developer Bypass
+        // 2. Otherwise, check for Developer Bypass or Local User Session
         else {
           const bypassToken = localStorage.getItem('admin_bypass_token');
           const bypassRole = localStorage.getItem('user_role');
+          const localUser = localStorage.getItem('user_session');
           
           if (bypassToken && bypassRole === 'admin') {
             console.log("🛠️ ProtectedRoute: Active Developer Admin Bypass detected.");
-            setSession({ user: { email: 'admin.venkis@gmail.com' } }); // Mock session
+            setSession({ user: { email: 'admin.venkis@gmail.com' }, role: 'admin' }); // Mock session
             setIsAdmin(true);
+          } else if (localUser) {
+            // Standard direct login user
+            setSession(JSON.parse(localUser));
+            setIsAdmin(false);
           }
         }
       } catch (error) {
@@ -53,9 +58,14 @@ const ProtectedRoute = ({ children, requireAdmin = false }) => {
       } else {
         // Even if Supabase session is null, check if we have a bypass active
         const bypassToken = localStorage.getItem('admin_bypass_token');
+        const localUser = localStorage.getItem('user_session');
+
         if (bypassToken) {
           setIsAdmin(true);
-          setSession({ user: { email: 'admin.venkis@gmail.com' } });
+          setSession({ user: { email: 'admin.venkis@gmail.com' }, role: 'admin' });
+        } else if (localUser) {
+          setIsAdmin(false);
+          setSession(JSON.parse(localUser));
         } else {
           setSession(null);
           setIsAdmin(false);
