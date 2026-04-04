@@ -1,7 +1,7 @@
 const supabase = require('../lib/supabase');
 const fs = require('fs');
 const path = require('path');
-const { notifyAdmin } = require('../utils/whatsapp');
+const { notifyAdminViaNtfy } = require('../utils/ntfy');
 
 const PRODUCTS_DATA_PATH = path.join(__dirname, '../data/products.json');
 
@@ -84,8 +84,8 @@ const createOrder = async (req, res) => {
       await supabase.from('stock').update({ quantity: Math.max(0, s.quantity - item.qty) }).eq('product_id', item.id);
     }
 
-    // 8. WhatsApp Notify
-    try { await notifyAdmin(order); } catch (e) { console.error("Notify failed", e); }
+    // 8. Instant Push Notification
+    try { await notifyAdminViaNtfy(order); } catch (e) { console.error("Notify failed", e); }
 
     res.status(201).json({ success: true, order_id: order.id, order });
   } catch (err) {
