@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   Package, Search, Filter, Phone, 
   ChevronRight, ArrowLeft, Loader2, CheckCircle2, 
-  MapPin, Clock, Edit3, Send, X 
+  MapPin, Clock, Edit3, Send, X, MessageCircle 
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import api from '../../lib/api';
@@ -112,9 +112,28 @@ const AdminOrders = () => {
                 {/* Customer Info */}
                 <div className="order-card-customer">
                   <p className="customer-name">{order.customer_name}</p>
-                  <a href={`tel:${order.customer_phone}`} className="customer-phone">
-                    <Phone size={14}/> {order.customer_phone}
-                  </a>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <a href={`tel:${order.customer_phone}`} className="customer-phone">
+                      <Phone size={14}/> {order.customer_phone}
+                    </a>
+                    <a 
+                      href={`https://wa.me/${(order.customer_phone || '').replace(/[^\d+]/g, '')}`} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      style={{
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        color: '#25D366', background: 'rgba(37, 211, 102, 0.1)', 
+                        border: '1px solid rgba(37, 211, 102, 0.2)',
+                        padding: '6px', borderRadius: '50%',
+                        transition: '0.3s'
+                      }}
+                      title="Chat on WhatsApp"
+                      onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.1)'; e.currentTarget.style.background = 'rgba(37, 211, 102, 0.2)'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.background = 'rgba(37, 211, 102, 0.1)'; }}
+                    >
+                      <MessageCircle size={16} />
+                    </a>
+                  </div>
                 </div>
 
                 {/* Address is now inside the View Modal to keep UI clean */}
@@ -168,7 +187,18 @@ const AdminOrders = () => {
                  <div>
                    <p className="text-xs text-secondary mb-1">Customer</p>
                    <p className="text-sm font-semibold">{selectedOrder.customer_name}</p>
-                   <p className="text-sm text-gold">{selectedOrder.customer_phone}</p>
+                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '2px' }}>
+                     <p className="text-sm text-gold m-0 leading-none">{selectedOrder.customer_phone}</p>
+                     <a 
+                       href={`https://wa.me/${(selectedOrder.customer_phone || '').replace(/[^\d+]/g, '')}`} 
+                       target="_blank" 
+                       rel="noopener noreferrer"
+                       style={{ color: '#25D366', display: 'flex', background: 'rgba(37, 211, 102, 0.1)', padding: '4px', borderRadius: '50%' }}
+                       title="Chat on WhatsApp"
+                     >
+                       <MessageCircle size={14} />
+                     </a>
+                   </div>
                  </div>
                  
                  {selectedOrder.delivery_type === 'delivery' ? (
