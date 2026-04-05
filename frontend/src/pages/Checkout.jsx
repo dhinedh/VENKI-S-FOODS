@@ -134,8 +134,14 @@ const Checkout = () => {
       const { data } = await api.post('/orders', orderData);
       
       if (data.success) {
+        setCompletedOrder({ 
+          id: data.order_id, 
+          total: totalPrice,
+          customer_name: formData.customer_name,
+          address: formData.delivery_type === 'delivery' ? `${formData.address.replace(/\\n/g, ', ')} (Pin: ${formData.pincode})` : 'Store Pickup',
+          itemsString: cartItems.map(item => `  - ${item.qty}x ${item.name}`).join('\\n')
+        });
         clearCart();
-        setCompletedOrder({ id: data.order_id, total: totalPrice });
         setShowUpiModal(true);
       }
     } catch (err) {
@@ -144,6 +150,19 @@ const Checkout = () => {
       setIsSubmitting(false);
     }
   };
+
+  const waText = completedOrder ? `Hi! I have just placed order #${completedOrder.id.substring(0,8)}.
+
+Here are my order details:
+* Name: ${completedOrder.customer_name}
+* Type: ${completedOrder.address === 'Store Pickup' ? 'Store Pickup' : 'Delivery'}
+* Address: ${completedOrder.address}
+* Items:
+${completedOrder.itemsString}
+
+* Total Amount: ₹${completedOrder.total}
+
+[Please attach your payment screenshot to confirm]` : "";
 
   return (
     <div className="checkout-page container section-padding mobile-pt-6">
@@ -302,7 +321,7 @@ const Checkout = () => {
             </p>
             <div className="modal-actions" style={{ display: 'flex', flexDirection: 'column' }}>
               <a 
-                href={`https://wa.me/917200883609?text=Hi! I have just placed order %23${completedOrder.id.substring(0,8)}.%0A%0AHere are my order details:%0A- Amount: ₹${completedOrder.total}%0A%0A[Please attach your payment screenshot to confirm]`}
+                href={`https://wa.me/917200883609?text=${encodeURIComponent(waText)}`}
                 target="_blank" rel="noopener noreferrer"
                 className="btn btn-primary btn-full justify-center mb-4 text-center items-center flex"
               >
