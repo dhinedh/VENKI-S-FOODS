@@ -16,6 +16,9 @@ const notifyAdminViaNtfy = async (order) => {
     const addressBlock = order.delivery_type === 'delivery' && order.address ? `\nAddress: ${order.address}` : '';
     const message = `Customer: ${order.customer_name} (${order.customer_phone})\nType: ${order.delivery_type.toUpperCase()}${addressBlock}\nItems: ${itemsList}\nTotal: ₹${order.total_price}`;
 
+    const rawPhone = (order.customer_phone || '').replace(/\D/g, '');
+    const waPhone = rawPhone.length === 10 ? '91' + rawPhone : rawPhone;
+
     // Send the request directly to the ntfy.sh servers
     await fetch(`https://ntfy.sh/${topic}`, {
       method: 'POST',
@@ -24,7 +27,7 @@ const notifyAdminViaNtfy = async (order) => {
         'Title': `Venkis Foods: New Order #${order.id.substring(0,8)}`,
         'Priority': 'urgent',
         'Tags': 'rotating_light,taco',
-        'Actions': `view, Chat on WhatsApp, https://wa.me/${((order.customer_phone || '').replace(/\\D/g, '').length === 10) ? '91' + (order.customer_phone || '').replace(/\\D/g, '') : (order.customer_phone || '').replace(/\\D/g, '')}`
+        'Actions': `view, Chat on WhatsApp, https://wa.me/${waPhone}`
       }
     });
 
