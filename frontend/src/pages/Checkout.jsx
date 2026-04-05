@@ -50,14 +50,14 @@ const Checkout = () => {
 
   // Calculate weight-based delivery charge (₹50 per started kg)
   const totalGrams = cartItems.reduce((acc, item) => {
-    let weightStr = (item.weight || "0").toString().toLowerCase().trim();
+    let weightStr = (item.weight || "1kg").toString().toLowerCase().trim();
     let grams = 0;
     if (weightStr.includes('kg')) {
-      grams = parseFloat(weightStr.replace(/[^\d.]/g, '')) * 1000;
+      grams = parseFloat(weightStr.replace(/[^\\d.]/g, '')) * 1000;
     } else {
-      grams = parseFloat(weightStr.replace(/[^\d.]/g, ''));
+      grams = parseFloat(weightStr.replace(/[^\\d.]/g, ''));
     }
-    return acc + ((isNaN(grams) ? 0 : grams) * item.qty);
+    return acc + ((isNaN(grams) || grams === 0 ? 1000 : grams) * item.qty);
   }, 0);
 
   const deliveryCharge = (subtotal >= 1000 || formData.delivery_type === 'pickup')
