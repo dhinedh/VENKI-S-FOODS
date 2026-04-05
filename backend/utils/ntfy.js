@@ -24,7 +24,7 @@ const notifyAdminViaNtfy = async (order) => {
         'Title': `Venkis Foods: New Order #${order.id.substring(0,8)}`,
         'Priority': 'urgent',
         'Tags': 'rotating_light,taco',
-        'Actions': `view, Chat on WhatsApp, https://wa.me/${(order.customer_phone || '').replace(/[^\\d+]/g, '')}`
+        'Actions': `view, Chat on WhatsApp, https://wa.me/${((order.customer_phone || '').replace(/\\D/g, '').length === 10) ? '91' + (order.customer_phone || '').replace(/\\D/g, '') : (order.customer_phone || '').replace(/\\D/g, '')}`
       }
     });
 

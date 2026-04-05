@@ -26,6 +26,12 @@ const AdminOrders = () => {
   const [updateForm, setUpdateForm] = useState({ status: '', tracking_note: '' });
   const [isUpdating, setIsUpdating] = useState(false);
 
+  const getWaLink = (phone) => {
+    let p = (phone || '').replace(/\D/g, '');
+    if (p.length === 10) p = '91' + p;
+    return `https://wa.me/${p}`;
+  };
+
   const fetchOrders = async () => {
     setLoading(true);
     try {
@@ -117,7 +123,7 @@ const AdminOrders = () => {
                       <Phone size={14}/> {order.customer_phone}
                     </a>
                     <a 
-                      href={`https://wa.me/${(order.customer_phone || '').replace(/[^\d+]/g, '')}`} 
+                      href={getWaLink(order.customer_phone)} 
                       target="_blank" 
                       rel="noopener noreferrer"
                       style={{
@@ -190,7 +196,7 @@ const AdminOrders = () => {
                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '2px' }}>
                      <p className="text-sm text-gold m-0 leading-none">{selectedOrder.customer_phone}</p>
                      <a 
-                       href={`https://wa.me/${(selectedOrder.customer_phone || '').replace(/[^\d+]/g, '')}`} 
+                       href={getWaLink(selectedOrder.customer_phone)} 
                        target="_blank" 
                        rel="noopener noreferrer"
                        style={{ color: '#25D366', display: 'flex', background: 'rgba(37, 211, 102, 0.1)', padding: '4px', borderRadius: '50%' }}
