@@ -95,11 +95,11 @@ const FoodCard = ({ product }) => {
             <motion.button 
               whileTap={{ scale: 0.9 }}
               onClick={handleAddToCart}
-              className="quick-add-btn"
+              className="buy-btn"
               disabled={!product.is_available}
-              aria-label="Add to cart"
+              aria-label="Buy Now"
             >
-              <Plus size={20} />
+              Buy
             </motion.button>
           </div>
         </div>
@@ -214,19 +214,21 @@ const FoodCard = ({ product }) => {
           opacity: 0.7;
         }
         
-        .quick-add-btn {
-          width: 48px; height: 48px; background: var(--gold-brushed); color: #000;
-          border-radius: 16px; display: flex; align-items: center; justify-content: center;
-          transition: 0.3s; border: none; cursor: pointer;
+        .buy-btn {
+          padding: 8px 24px; background: var(--gold-gradient, #cfb53b); color: #fff;
+          border-radius: 12px; display: flex; align-items: center; justify-content: center;
+          transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: none; cursor: pointer;
+          font-weight: 800; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1.5px;
+          box-shadow: 0 5px 15px rgba(207, 181, 59, 0.3);
         }
-        .quick-add-btn:hover:not(:disabled) { transform: scale(1.05); filter: brightness(1.1); box-shadow: 0 5px 15px var(--primary-glow); }
-        .quick-add-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .buy-btn:hover:not(:disabled) { transform: translateY(-2px); filter: brightness(1.1); box-shadow: 0 8px 20px var(--primary-glow); }
+        .buy-btn:disabled { opacity: 0.5; cursor: not-allowed; background: var(--border-glass); box-shadow: none; }
         @media (max-width: 500px) {
           .card-img-wrapper { height: 160px; margin: 6px; }
           .card-content { padding: 1rem; }
           .card-title { font-size: 1.1rem; margin-bottom: 1rem; }
           .amount { font-size: 1.2rem; }
-          .quick-add-btn { width: 36px; height: 36px; border-radius: 10px; }
+          .buy-btn { padding: 6px 16px; font-size: 0.75rem; border-radius: 10px; box-shadow: 0 4px 10px rgba(207, 181, 59, 0.2); }
           .badge-diet { width: 16px; height: 16px; }
           .card-category { font-size: 0.6rem; letter-spacing: 1px; }
           .card-extra-info { gap: 6px; margin-bottom: 1rem; }
