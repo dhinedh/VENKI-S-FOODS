@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageCircle, Bot, X, Send, Sparkles } from 'lucide-react';
+import { MessageCircle, Bot, X, Send, Sparkles, ShoppingCart } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import useCartStore from '../store/cartStore';
 
 const FloatingActions = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [showTooltip, setShowTooltip] = useState(true);
+  const cartCount = useCartStore(state => state.getCount());
 
   const whatsappNumber = "+917200883609";
   const whatsappMessage = encodeURIComponent("Namaste Venki's Foods! I'd like to know more about your artisanal pickles.");
@@ -47,6 +50,65 @@ const FloatingActions = () => {
       </AnimatePresence>
 
       <div className="actions-stack" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+
+        {/* Cart Icon */}
+        <motion.div
+          whileHover={{ scale: 1.1, y: -5 }}
+          whileTap={{ scale: 0.9 }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          <Link
+            to="/cart"
+            className="action-btn cart-btn glass-card"
+            style={{
+              width: '3.5rem',
+              height: '3.5rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: '50%',
+              color: 'var(--primary-gold, #cfb53b)',
+              cursor: 'pointer',
+              border: '1px solid var(--border-gold, rgba(207, 181, 59, 0.3))',
+              boxShadow: '0 10px 25px rgba(207, 181, 59, 0.15)',
+              position: 'relative',
+              textDecoration: 'none'
+            }}
+          >
+            <ShoppingCart size={26} />
+            <AnimatePresence>
+              {cartCount > 0 && (
+                <motion.span
+                  key="cart-badge"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  exit={{ scale: 0 }}
+                  transition={{ type: "spring", stiffness: 500, damping: 15 }}
+                  style={{
+                    position: 'absolute',
+                    top: '-5px',
+                    right: '-5px',
+                    background: '#ef4444',
+                    color: 'white',
+                    fontSize: '0.75rem',
+                    fontWeight: 'bold',
+                    width: '20px',
+                    height: '20px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderRadius: '50%',
+                    boxShadow: '0 2px 5px rgba(0,0,0,0.2)'
+                  }}
+                >
+                  {cartCount}
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </Link>
+        </motion.div>
 
         {/* WhatsApp Icon */}
         <motion.a
