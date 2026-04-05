@@ -58,8 +58,8 @@ const createOrder = async (req, res) => {
       }
     }
 
-    // 4. Delivery Charge (₹50 per 1 kg or part thereof)
-    let delivery_charge = delivery_type === 'pickup' 
+    // 4. Delivery Charge (₹50 per 1 kg or part thereof, FREE if >= 1000)
+    let delivery_charge = (subtotal >= 1000 || delivery_type === 'pickup')
       ? 0 
       : Math.max(1, Math.ceil(totalGrams / 1000)) * 50;
 

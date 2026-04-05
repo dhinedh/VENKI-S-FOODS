@@ -13,7 +13,8 @@ const notifyAdminViaNtfy = async (order) => {
     const itemsList = order.items.map(item => `${item.name} x${item.qty}`).join(", ");
     
     // The main body of the push notification
-    const message = `Customer: ${order.customer_name} (${order.customer_phone})\nType: ${order.delivery_type.toUpperCase()}\nItems: ${itemsList}\nTotal: ₹${order.total_price}`;
+    const addressBlock = order.delivery_type === 'delivery' && order.address ? `\nAddress: ${order.address}` : '';
+    const message = `Customer: ${order.customer_name} (${order.customer_phone})\nType: ${order.delivery_type.toUpperCase()}${addressBlock}\nItems: ${itemsList}\nTotal: ₹${order.total_price}`;
 
     // Send the request directly to the ntfy.sh servers
     await fetch(`https://ntfy.sh/${topic}`, {
