@@ -6,6 +6,7 @@ import useCartStore from '../store/cartStore';
 
 const FloatingActions = () => {
   const [showTooltip, setShowTooltip] = useState(true);
+  const [hoveredItem, setHoveredItem] = useState(null);
   const cartCount = useCartStore(state => state.getCount());
 
   const whatsappNumber = "+917200883609";
@@ -48,19 +49,138 @@ const FloatingActions = () => {
         )}
       </AnimatePresence>
 
-      <div className="actions-stack" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+      <div className="actions-stack" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'flex-end' }}>
 
-        {/* Cart Icon */}
-        <motion.div
-          whileHover={{ scale: 1.1, y: -5 }}
-          whileTap={{ scale: 0.9 }}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-        >
-          <Link
-            to="/cart"
-            className="action-btn cart-btn glass-card"
+        {/* Cart Icon Container */}
+        <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+          <AnimatePresence>
+            {hoveredItem === 'cart' && (
+              <motion.div
+                initial={{ opacity: 0, x: 10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 10 }}
+                style={{
+                  position: 'absolute',
+                  right: '100%',
+                  marginRight: '12px',
+                  background: 'var(--primary-dark, #1a1a1a)',
+                  color: 'var(--primary-gold, #cfb53b)',
+                  border: '1px solid var(--border-gold, #cfb53b)',
+                  padding: '6px 12px',
+                  borderRadius: '20px',
+                  fontSize: '0.85rem',
+                  fontWeight: '600',
+                  whiteSpace: 'nowrap',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
+                }}
+              >
+                View Cart
+              </motion.div>
+            )}
+          </AnimatePresence>
+          <motion.div
+            whileHover={{ scale: 1.1, y: -5 }}
+            whileTap={{ scale: 0.9 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            onMouseEnter={() => setHoveredItem('cart')}
+            onMouseLeave={() => setHoveredItem(null)}
+          >
+            <Link
+              to="/cart"
+              className="action-btn cart-btn glass-card"
+              style={{
+                width: '3.5rem',
+                height: '3.5rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: '50%',
+                color: 'var(--primary-gold, #cfb53b)',
+                cursor: 'pointer',
+                border: '1px solid var(--border-gold, rgba(207, 181, 59, 0.3))',
+                boxShadow: '0 10px 25px rgba(207, 181, 59, 0.15)',
+                position: 'relative',
+                textDecoration: 'none'
+              }}
+            >
+              <ShoppingCart size={26} />
+              <AnimatePresence>
+                {cartCount > 0 && (
+                  <motion.span
+                    key="cart-badge"
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    exit={{ scale: 0 }}
+                    transition={{ type: "spring", stiffness: 500, damping: 15 }}
+                    style={{
+                      position: 'absolute',
+                      top: '-5px',
+                      right: '-5px',
+                      background: '#ef4444',
+                      color: 'white',
+                      fontSize: '0.75rem',
+                      fontWeight: 'bold',
+                      width: '20px',
+                      height: '20px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderRadius: '50%',
+                      boxShadow: '0 2px 5px rgba(0,0,0,0.2)'
+                    }}
+                  >
+                    {cartCount}
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </Link>
+          </motion.div>
+        </div>
+
+        {/* WhatsApp Icon Container */}
+        <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+          <AnimatePresence>
+            {hoveredItem === 'whatsapp' && (
+              <motion.div
+                initial={{ opacity: 0, x: 10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 10 }}
+                style={{
+                  position: 'absolute',
+                  right: '100%',
+                  marginRight: '12px',
+                  background: 'var(--primary-dark, #1a1a1a)',
+                  color: '#25D366',
+                  border: '1px solid rgba(37, 211, 102, 0.3)',
+                  padding: '6px 12px',
+                  borderRadius: '20px',
+                  fontSize: '0.85rem',
+                  fontWeight: '600',
+                  whiteSpace: 'nowrap',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
+                }}
+              >
+                Chat with us
+              </motion.div>
+            )}
+          </AnimatePresence>
+          <motion.a
+            href={whatsappUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            whileHover={{ scale: 1.1, y: -5 }}
+            whileTap={{ scale: 0.9 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            onMouseEnter={() => {
+              setShowTooltip(false);
+              setHoveredItem('whatsapp');
+            }}
+            onMouseLeave={() => setHoveredItem(null)}
+            className="action-btn whatsapp-btn glass-card"
             style={{
               width: '3.5rem',
               height: '3.5rem',
@@ -68,74 +188,15 @@ const FloatingActions = () => {
               alignItems: 'center',
               justifyContent: 'center',
               borderRadius: '50%',
-              color: 'var(--primary-gold, #cfb53b)',
+              color: '#25D366',
               cursor: 'pointer',
-              border: '1px solid var(--border-gold, rgba(207, 181, 59, 0.3))',
-              boxShadow: '0 10px 25px rgba(207, 181, 59, 0.15)',
-              position: 'relative',
-              textDecoration: 'none'
+              border: '1px solid rgba(37, 211, 102, 0.3)',
+              boxShadow: '0 10px 20px rgba(37, 211, 102, 0.15)'
             }}
           >
-            <ShoppingCart size={26} />
-            <AnimatePresence>
-              {cartCount > 0 && (
-                <motion.span
-                  key="cart-badge"
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  exit={{ scale: 0 }}
-                  transition={{ type: "spring", stiffness: 500, damping: 15 }}
-                  style={{
-                    position: 'absolute',
-                    top: '-5px',
-                    right: '-5px',
-                    background: '#ef4444',
-                    color: 'white',
-                    fontSize: '0.75rem',
-                    fontWeight: 'bold',
-                    width: '20px',
-                    height: '20px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    borderRadius: '50%',
-                    boxShadow: '0 2px 5px rgba(0,0,0,0.2)'
-                  }}
-                >
-                  {cartCount}
-                </motion.span>
-              )}
-            </AnimatePresence>
-          </Link>
-        </motion.div>
-
-        {/* WhatsApp Icon */}
-        <motion.a
-          href={whatsappUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          whileHover={{ scale: 1.1, y: -5 }}
-          whileTap={{ scale: 0.9 }}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="action-btn whatsapp-btn glass-card"
-          style={{
-            width: '3.5rem',
-            height: '3.5rem',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderRadius: '50%',
-            color: '#25D366',
-            cursor: 'pointer',
-            border: '1px solid rgba(37, 211, 102, 0.3)',
-            boxShadow: '0 10px 20px rgba(37, 211, 102, 0.15)'
-          }}
-          onMouseEnter={() => setShowTooltip(false)}
-        >
-          <MessageCircle size={28} fill="currentColor" fillOpacity={0.1} />
-        </motion.a>
+            <MessageCircle size={28} fill="currentColor" fillOpacity={0.1} />
+          </motion.a>
+        </div>
 
       </div>
 
