@@ -37,6 +37,17 @@ const Checkout = () => {
   const [showUpiModal, setShowUpiModal] = useState(false);
   const [completedOrder, setCompletedOrder] = useState(null);
 
+  useEffect(() => {
+    if (showUpiModal) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [showUpiModal]);
+
   // Calculate weight-based delivery charge (₹50 per started kg)
   const totalGrams = cartItems.reduce((acc, item) => {
     let weightStr = (item.weight || "0").toString().toLowerCase().trim();
@@ -92,10 +103,10 @@ const Checkout = () => {
     };
     fetchUser();
     
-    if (cartItems.length === 0) {
+    if (cartItems.length === 0 && !completedOrder && !isSubmitting) {
       navigate('/menu');
     }
-  }, [cartItems, navigate]);
+  }, [cartItems, navigate, completedOrder, isSubmitting]);
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -112,7 +123,7 @@ const Checkout = () => {
       }
 
       const orderData = {
-        user_id: user?.id === user?.phone ? null : user?.id,
+        user_id: (user?.id === user?.phone || user?.id === 'admin') ? null : user?.id,
         items: cartItems,
         ...formData,
         address: formData.delivery_type === 'delivery' 
@@ -279,21 +290,23 @@ const Checkout = () => {
       {showUpiModal && completedOrder && (
         <div className="upi-modal-overlay">
           <div className="upi-modal-card glass-card">
-            <h3 className="font-serif text-3xl gold-text mb-4" style={{marginTop: 0}}>Confirm via UPI</h3>
+            <h3 className="font-serif text-3xl gold-text mb-4" style={{marginTop: 0}}>Order Placed!</h3>
             <p className="text-secondary mb-6 p-text">
-              Almost done! Pay <strong>₹{completedOrder.total}</strong> via UPI to:
+              Your order is placed! Please wait for confirmation.
+              <br/><br/>
+              To speed up confirmation, pay <strong>₹{completedOrder.total}</strong> via UPI to:
             </p>
             <div className="upi-number">72008 83609</div>
             <p className="text-secondary modal-small-text">
-              After payment, tap the button below to share your screenshot safely on WhatsApp to confirm your order.
+              After payment, tap the button below to share your payment screenshot on WhatsApp to confirm your order.
             </p>
-            <div className="modal-actions">
+            <div className="modal-actions" style={{ display: 'flex', flexDirection: 'column' }}>
               <a 
-                href={`https://wa.me/917200883609?text=Hi! I have just placed order %23${completedOrder.id.substring(0,8)}.%0A%0AHere is my payment screenshot for ₹${completedOrder.total}.`}
+                href={`https://wa.me/917200883609?text=Hi! I have just placed order %23${completedOrder.id.substring(0,8)}.%0A%0AHere are my order details:%0A- Amount: ₹${completedOrder.total}%0A%0A[Please attach your payment screenshot to confirm]`}
                 target="_blank" rel="noopener noreferrer"
                 className="btn btn-primary btn-full justify-center mb-4 text-center items-center flex"
               >
-                Share Screenshot <ArrowRight size={18} className="ml-2"/>
+                Confirm your order with WhatsApp <ArrowRight size={18} className="ml-2"/>
               </a>
               <button 
                 onClick={() => navigate(`/track/${completedOrder.id}`)}
