@@ -20,8 +20,18 @@ const Cart = () => {
   const removeItem = useCartStore((state) => state.removeItem);
   const subtotal = useCartStore((state) => state.getTotal());
 
-  const deliveryThreshold = 300;
-  const isFreeDelivery = subtotal >= deliveryThreshold;
+  const totalGrams = cartItems.reduce((acc, item) => {
+    let weightStr = (item.weight || "1kg").toString().toLowerCase().trim();
+    let grams = 0;
+    if (weightStr.includes('kg')) {
+      grams = parseFloat(weightStr.replace(/[^\d.]/g, '')) * 1000;
+    } else {
+      grams = parseFloat(weightStr.replace(/[^\d.]/g, ''));
+    }
+    return acc + ((isNaN(grams) || grams === 0 ? 1000 : grams) * item.qty);
+  }, 0);
+
+  const deliveryCharge = Math.max(1, Math.ceil(totalGrams / 1000)) * 50;
 
   if (cartItems.length === 0) {
     return (
@@ -113,25 +123,16 @@ const Cart = () => {
             <div className="summary-row">
               <div className="delivery-label">
                  <span>Delivery Charge</span>
-                 <p className="text-xs text-secondary">Free delivery above ₹{deliveryThreshold}</p>
+                 <p className="text-xs text-secondary">Based on total weight</p>
               </div>
-              <span className={isFreeDelivery ? 'free-text' : ''}>
-                {isFreeDelivery ? 'FREE' : '₹40'}
-              </span>
+              <span>₹{deliveryCharge}</span>
             </div>
-
-            {!isFreeDelivery && (
-              <div className="delivery-tip glass-card">
-                <Truck size={18} color="var(--primary-color)" />
-                <p>Add <strong>₹{deliveryThreshold - subtotal}</strong> more for FREE delivery!</p>
-              </div>
-            )}
 
             <div className="divider my-6"></div>
 
             <div className="summary-row total">
               <span>Estimated Total</span>
-              <span>₹{subtotal + (isFreeDelivery ? 0 : 40)}</span>
+              <span>₹{subtotal + deliveryCharge}</span>
             </div>
 
             <button className="btn btn-primary btn-full mt-8 btn-lg" onClick={() => navigate('/checkout')}>

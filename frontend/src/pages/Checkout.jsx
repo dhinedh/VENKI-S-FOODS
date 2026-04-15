@@ -60,7 +60,7 @@ const Checkout = () => {
     return acc + ((isNaN(grams) || grams === 0 ? 1000 : grams) * item.qty);
   }, 0);
 
-  const deliveryCharge = (subtotal >= 1000 || formData.delivery_type === 'pickup')
+  const deliveryCharge = formData.delivery_type === 'pickup'
     ? 0 
     : Math.max(1, Math.ceil(totalGrams / 1000)) * 50;
 
