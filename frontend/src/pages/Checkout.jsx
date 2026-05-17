@@ -315,7 +315,7 @@ ${completedOrder.itemsString}
               <br/><br/>
               To speed up confirmation, pay <strong>₹{completedOrder.total}</strong> via UPI to:
             </p>
-            <div className="upi-number">72008 83609</div>
+            <div className="upi-number">8220078359 - Venki bala </div>
             <p className="text-secondary modal-small-text">
               After payment, tap the button below to share your payment screenshot on WhatsApp to confirm your order.
             </p>
